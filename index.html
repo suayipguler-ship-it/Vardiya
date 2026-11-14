@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="color-scheme" content="light" />
-  <title>KEGM Çanakkale Kılavuzluk - Vardiya & İzin Planlama Sistemi</title>
+  <title>KEGM Çanakkale Kılavuzluk - Mehmetçik 2. Posta Vardiya & İzin Planlama</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
@@ -80,38 +80,71 @@
     .role-bkk { color: #991b1b; font-weight: 800; }
     .role-staj { color: #4338ca; font-style: italic; }
 
-    /* Yıllık İzin Planlama Tablosu (Örnek Excel Benzeri) */
-    .plan-table {
+    /* Görseldeki Yıllık İzin Planlama Tablosu (izin Planlama 2026) */
+    .excel-plan-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 11px;
-      min-width: 1120px;
-      background: #ffffff;
+      font-size: 11.5px;
+      min-width: 920px;
+      background-color: #ffffff;
+      color: #000000;
     }
-    .plan-table th,
-    .plan-table td {
-      border: 1px solid #94a3b8;
-      padding: 4px 5px;
-      text-align: center;
+    .excel-plan-table th,
+    .excel-plan-table td {
+      border: 1.5px solid #0f172a;
+      padding: 3px 5px;
       vertical-align: middle;
     }
-    .plan-table th {
+    .excel-plan-table th {
+      background-color: #e2e8f0;
       font-weight: 800;
+      text-align: center;
       color: #0f172a;
     }
-    .plan-input-date {
-      width: 114px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 2px 4px;
-      font-size: 11px;
-      font-weight: 600;
-      background: #ffffff;
-      color: #0f172a;
+    .row-green {
+      background-color: #92d050; /* Excel yeşil tonu */
     }
-    .plan-input-date:focus {
-      outline: 2px solid #0284c7;
-      border-color: #0284c7;
+    .row-white {
+      background-color: #ffffff;
+    }
+    .season-banner {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: 3px;
+      text-align: center;
+      background-color: #92d050;
+      color: #000000;
+      width: 34px;
+    }
+    .slot-select {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #000000;
+      padding: 2px 3px;
+      cursor: pointer;
+      outline: none;
+    }
+    .slot-select:focus {
+      background-color: rgba(255, 255, 255, 0.85);
+      box-shadow: inset 0 0 0 2px #0284c7;
+      border-radius: 4px;
+    }
+    /* Görseldeki renkli hücre vurguları */
+    .slot-filled-default {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+    .slot-filled-blue {
+      background-color: #00b0f0 !important;
+      color: #000000 !important;
+    }
+    .slot-filled-red {
+      background-color: #c0504d !important;
+      color: #000000 !important;
     }
 
     /* Yazdırma Bölümü */
@@ -195,7 +228,7 @@
 </head>
 <body class="pb-12">
 
-  <!-- ÜST BAR (RENKLİ MARİNE TEMA) -->
+  <!-- ÜST BAR -->
   <header class="no-print bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white sticky top-0 z-30 shadow-lg border-b border-blue-800/60">
     <div class="max-w-7xl mx-auto px-3 py-2.5 flex flex-wrap items-center justify-between gap-2">
       <div class="flex items-center gap-2.5">
@@ -204,7 +237,7 @@
         </div>
         <div>
           <h1 class="text-sm sm:text-base font-extrabold leading-tight tracking-tight">Çanakkale Kılavuzluk Vardiya & İzin Sistemi</h1>
-          <p class="text-[11px] text-sky-200">Mehmetçik 2. Posta • Aylık İaşe & Yıllık İzin Planlama</p>
+          <p class="text-[11px] text-sky-200">Mehmetçik 2. Posta (2. Vardiya Kılavuz Kaptanları) • Aylık İaşe & Yıllık İzin Planlama</p>
         </div>
       </div>
 
@@ -212,8 +245,8 @@
         <span id="syncBadge" class="text-[11px] px-2.5 py-1 rounded-full bg-white/10 border border-white/20 text-amber-300 font-semibold">
           ● Yerel Mod
         </span>
-        <!-- YENİ YILLIK İZİN PLANLAMA MODÜLÜ BUTONU -->
-        <button onclick="openAnnualPlanModal()" class="text-xs bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-1.5 rounded-lg font-extrabold shadow-md transition flex items-center gap-1">
+        <!-- YILLIK İZİN PLANLAMA MODÜLÜ BUTONU -->
+        <button onclick="openAnnualPlanModal()" class="text-xs bg-gradient-to-r from-lime-500 to-emerald-600 hover:from-lime-600 hover:to-emerald-700 text-white px-3.5 py-1.5 rounded-lg font-extrabold shadow-md transition flex items-center gap-1">
           📅 İzin Planlama
         </button>
         <button onclick="openModal('cloudModal')" class="text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1.5 rounded-lg font-semibold transition">
@@ -255,7 +288,7 @@
                 <option value="10" selected>Kasım</option>
                 <option value="11">Aralık</option>
               </select>
-              <select id="yearSelect" onchange="renderAll()" class="bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-sm font-bold text-slate-800">
+              <select id="yearSelect" onchange="renderAll()" class="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm font-bold text-slate-800">
                 <option value="2026" selected>2026</option>
                 <option value="2027">2027</option>
               </select>
@@ -273,11 +306,11 @@
         <!-- 19 Kasım Referanslı 4 Gün Çalış / 8 Gün İzin Otomatik Hesaplayıcı -->
         <div class="bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 rounded-xl p-2.5 space-y-2">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold text-sky-950">🔄 4 Gün Çalışma / 8 Gün İzin Otomasyonu</span>
+            <span class="text-xs font-extrabold text-sky-950">🔄 Mehmetçik 2. Posta (2. Vardiya) 4/8 Döngüsü</span>
             <span class="text-[10px] font-bold bg-sky-600 text-white px-2 py-0.5 rounded-full">Ref: 19 Kas 2026</span>
           </div>
           <p class="text-[11px] text-sky-900 leading-snug">
-            Vardiya grubuna (V1/V2/V3) göre görev günlerini <b>Ç</b>, istirahat günlerini <b>İ</b> olarak otomatik doldurur veya tüm ayı standart <b>Ç</b> yapar.
+            Listedeki tüm 2. Vardiya kılavuz kaptanlar için 4 gün görev (<b>Ç</b>) / 8 gün istirahat (<b>İ</b>) döngüsünü uygular veya tüm ayı standart <b>Ç</b> yapar.
           </p>
           <div class="flex flex-wrap gap-1.5">
             <button onclick="applyCycleToMonth()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2.5 rounded-xl shadow-sm transition">
@@ -295,7 +328,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex-1 min-w-[210px]">
             <label for="myPilotSelect" class="block text-[11px] font-extrabold uppercase tracking-wider text-indigo-700">
-              📱 Ben Kimim? (Kendi Telefonundan Hızlı Düzenle)
+              📱 Ben Kimim? (2. Vardiya Kılavuz Kaptan Seçimi)
             </label>
             <select id="myPilotSelect" onchange="selectMyPilot(this.value)"
               class="mt-1 w-full bg-indigo-50/70 border-2 border-indigo-300 rounded-xl px-2.5 py-1.5 text-sm font-extrabold text-indigo-950">
@@ -304,8 +337,8 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5">
-            <button onclick="openAnnualPlanModal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl font-bold shadow-sm transition">
-              📅 Yıllık İzin Planı
+            <button onclick="openAnnualPlanModal()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl font-bold shadow-sm transition">
+              📅 Yıllık İzin Planlama
             </button>
             <button onclick="openBulkModal()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl font-bold shadow-sm transition">
               🗓️ Toplu Gün
@@ -357,12 +390,12 @@
         </div>
 
         <div id="noPilotHint" class="text-xs text-slate-600 bg-gradient-to-r from-indigo-50/60 to-sky-50/60 border border-dashed border-indigo-300 rounded-xl p-3">
-          💡 Telefonunuzdan kendi satırınızı düzenlemek için adınızı seçin. Yıllık 3 dönemlik izin planlaması ve vardiya çakışma kontrolü için <b>📅 İzin Planlama</b> kutusuna tıklayın.
+          💡 Listedeki tüm kılavuz kaptanlar <b>2. Vardiya</b> personelidir. Yıllık izin periyot tablosunda boş aralıklara izin yazmak için üstteki <b>📅 İzin Planlama</b> kutusuna tıklayın.
         </div>
       </div>
     </section>
 
-    <!-- EKRAN GÖRÜNÜMÜ TABLOSU -->
+    <!-- EKRAN GÖRÜNÜMÜ İAŞE TABLOSU -->
     <section class="screen-only-table iase-wrapper p-2.5 sm:p-3.5">
       <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2 mb-2">
         <div class="text-left">
@@ -392,110 +425,115 @@
       </div>
     </section>
 
-    <!-- A4 YATAY RESMİ ÇIKTI KONTEYNERİ (BİREBİR ÖRNEK FORMAT: S.No | Sicil | Adı Soyadı | Görevi | TİH | Çalışma | İzin | İmza) -->
+    <!-- A4 YATAY RESMİ ÇIKTI KONTEYNERİ -->
     <section id="printPagesContainer" class="print-only-container"></section>
 
   </main>
 
   <!-- ========================================================================= -->
-  <!-- MODÜL: YILLIK İZİN PLANLAMA SAYFASI (ÖRNEK EXCEL BENZERİ GELİŞMİŞ MODÜL) -->
+  <!-- MODÜL: YILLIK İZİN PLANLAMA 2026 (GÖRSELDEKİ EXCEL SAYFASIYLA BİREBİR)     -->
   <!-- ========================================================================= -->
-  <div id="annualPlanModal" class="no-print fixed inset-0 bg-slate-900/75 backdrop-blur-xs hidden items-center justify-center z-50 p-2 sm:p-4">
-    <div class="bg-white rounded-2xl max-w-[96vw] w-full h-[94vh] flex flex-col shadow-2xl border border-slate-300 overflow-hidden">
+  <div id="annualPlanModal" class="no-print fixed inset-0 bg-slate-900/80 backdrop-blur-xs hidden items-center justify-center z-50 p-1.5 sm:p-3">
+    <div class="bg-white rounded-2xl max-w-[98vw] w-full h-[95vh] flex flex-col shadow-2xl border border-slate-400 overflow-hidden">
       
-      <!-- Modül Üst Başlığı -->
-      <div class="bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+      <!-- Üst Koyu Bar (Görseldeki 'izin Planlama 2026' Başlığına Uygun) -->
+      <div class="bg-slate-900 text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-700">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg font-extrabold">📅</div>
+          <button onclick="closeModal('annualPlanModal')" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white font-extrabold text-lg flex items-center justify-center" title="Kapat">
+            ✕
+          </button>
           <div>
-            <h2 class="text-sm sm:text-base font-extrabold leading-tight">KEGM Çanakkale Kılavuzluk — Yıllık İzin Planlama Çizelgesi</h2>
-            <p class="text-[11px] text-amber-100">Vardiya Bazlı (V1 / V2 / V3) 3 Dönem İzin Planı • Çakışma Analizi • İaşe Çizelgesine Otomatik Aktarım</p>
+            <h2 class="text-sm sm:text-base font-extrabold tracking-tight flex items-center gap-2">
+              <span id="planModalTitleText">izin Planlama 2026</span>
+              <span class="text-[11px] font-semibold bg-emerald-600/30 border border-emerald-400/50 text-emerald-200 px-2 py-0.5 rounded-full">Mehmetçik 2. Posta (2. Vardiya)</span>
+            </h2>
+            <p class="text-[11px] text-slate-300">Boş aralıklara tıklayıp açılır listeden Kılavuz Kaptan seçerek izin yazabilirsiniz</p>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-1.5">
-          <select id="planYearSelect" onchange="renderAnnualPlanTable()" class="bg-white text-slate-900 rounded-lg px-2.5 py-1.5 text-xs font-extrabold">
+          <select id="planYearSelect" onchange="renderAnnualPlanTable()" class="bg-slate-800 border border-slate-600 text-white rounded-lg px-2.5 py-1.5 text-xs font-extrabold">
             <option value="2026" selected>2026 Yılı</option>
             <option value="2027">2027 Yılı</option>
           </select>
+          <button onclick="syncAllAnnualPlansToIase()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg font-bold shadow">
+            🔄 Planlanan İzinleri İaşeye İşle
+          </button>
           <button onclick="exportAnnualPlanExcel()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-bold shadow">
-            📊 Planı Excel (.xlsx) İndir
+            📊 Excel (.xlsx)
           </button>
-          <button onclick="printAnnualPlan()" class="text-xs bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg font-bold shadow">
-            🖨️ Planı Yazdır
-          </button>
-          <button onclick="closeModal('annualPlanModal')" class="ml-1 w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 text-white font-extrabold text-lg flex items-center justify-center">
-            &times;
+          <button onclick="printAnnualPlan()" class="text-xs bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-lg font-bold shadow">
+            🖨️ Yazdır
           </button>
         </div>
       </div>
 
-      <!-- Vardiya Sekmeleri & Çakışma Kontrol Çubuğu -->
-      <div class="bg-slate-100 border-b border-slate-300 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-        <div class="flex flex-wrap items-center gap-1.5">
-          <button id="tabShiftAll" onclick="setPlanShiftFilter('ALL')" class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-white shadow-xs">
-            Tümü (3 Vardiya)
-          </button>
-          <button id="tabShift1" onclick="setPlanShiftFilter(1)" class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-white text-slate-700 border border-slate-300 hover:bg-sky-50">
-            1. Vardiya
-          </button>
-          <button id="tabShift2" onclick="setPlanShiftFilter(2)" class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-white text-slate-700 border border-slate-300 hover:bg-sky-50">
-            2. Vardiya
-          </button>
-          <button id="tabShift3" onclick="setPlanShiftFilter(3)" class="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-white text-slate-700 border border-slate-300 hover:bg-sky-50">
-            3. Vardiya
-          </button>
+      <!-- Kaptan İzin Özeti Şeridi (Seçilen Kaptanın Yazdığı Dönemleri Gösterir) -->
+      <div class="bg-slate-100 border-b border-slate-300 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="font-extrabold text-slate-800">🎨 Hücre Renk İşareti:</span>
+          <span class="px-2 py-0.5 rounded border border-slate-400 bg-white font-bold">Standart / 1. Dönem</span>
+          <span class="px-2 py-0.5 rounded border border-slate-400 font-bold" style="background:#00b0f0;">Mavi (2. Dönem / Ek İzin)</span>
+          <span class="px-2 py-0.5 rounded border border-slate-400 font-bold" style="background:#c0504d;">Kırmızı (Özel / Yedek)</span>
+          <span class="text-[11px] text-slate-600">(Hücre yanındaki küçük renk noktasından rengi değiştirebilirsiniz)</span>
         </div>
-
-        <!-- Canlı Tarih Çakışma Sorgulayıcı -->
-        <div class="flex flex-wrap items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs">
-          <span class="font-bold text-slate-700">🔍 Tarihte Kim İzinde?:</span>
-          <input type="date" id="conflictCheckDate" onchange="checkDateConflicts()" class="border border-slate-300 rounded-lg px-2 py-0.5 font-semibold text-xs" />
-          <span id="conflictResultBadge" class="font-bold text-slate-600">Tarih seçerek vardiya yoğunluğunu görün</span>
-        </div>
+        <div id="planStatsSummary" class="font-extrabold text-slate-900"></div>
       </div>
 
-      <!-- Planlama Tablosu Alanı (Örnek Excel Yapısı: Sicil | Adı Soyadı | Toplam Hak | Planlanan | Kalan | 1. Dönem | 2. Dönem | 3. Dönem | İaşeye Aktar) -->
-      <div class="flex-1 overflow-auto p-3 bg-slate-50">
-        <div class="border border-slate-300 rounded-xl overflow-x-auto shadow-xs bg-white">
-          <table class="plan-table" id="annualPlanTable">
+      <!-- ANA TABLO ALANI (GÖRSELDEKİ İZİN PLANLAMA 2026 SAYFASI) -->
+      <div class="flex-1 overflow-auto p-2 sm:p-3 bg-slate-200">
+        <div class="max-w-6xl mx-auto bg-white shadow-lg border-2 border-slate-900 overflow-x-auto">
+          <table class="excel-plan-table" id="excelPlanTable">
             <thead>
               <tr>
-                <th rowspan="2" class="bg-slate-200 w-10">S.No</th>
-                <th rowspan="2" class="bg-slate-200 w-14">Vardiya</th>
-                <th rowspan="2" class="bg-slate-200 w-16">Sicil</th>
-                <th rowspan="2" class="bg-slate-200 w-44 text-left pl-2">Adı Soyadı</th>
-                <th rowspan="2" class="bg-amber-100 w-16">Toplam<br>İzin Hakkı</th>
-                <th rowspan="2" class="bg-orange-100 w-16">Planlanan<br>Gün</th>
-                <th rowspan="2" class="bg-emerald-100 w-16">Kalan<br>İzin</th>
-                <th colspan="3" class="bg-sky-100 text-sky-950">1. İZİN DÖNEMİ</th>
-                <th colspan="3" class="bg-indigo-100 text-indigo-950">2. İZİN DÖNEMİ</th>
-                <th colspan="3" class="bg-purple-100 text-purple-950">3. İZİN DÖNEMİ</th>
-                <th rowspan="2" class="bg-slate-200 w-28">İaşe Çizelgesi</th>
-              </tr>
-              <tr>
-                <th class="bg-sky-50">Başlangıç</th>
-                <th class="bg-sky-50">Bitiş</th>
-                <th class="bg-sky-50 w-11">Gün</th>
-                <th class="bg-indigo-50">Başlangıç</th>
-                <th class="bg-indigo-50">Bitiş</th>
-                <th class="bg-indigo-50 w-11">Gün</th>
-                <th class="bg-purple-50">Başlangıç</th>
-                <th class="bg-purple-50">Bitiş</th>
-                <th class="bg-purple-50 w-11">Gün</th>
+                <th style="width: 34px;">No</th>
+                <th style="width: 68px;">Dönem</th>
+                <th style="width: 155px;">Tarih Aralığı</th>
+                <th>1. Kılavuz Kaptan</th>
+                <th>2. Kılavuz Kaptan</th>
+                <th>3. Kılavuz Kaptan</th>
+                <th>4. Kılavuz Kaptan</th>
               </tr>
             </thead>
-            <tbody id="annualPlanTbody"></tbody>
+            <tbody id="excelPlanTbody"></tbody>
           </table>
-        </div>
-      </div>
 
-      <!-- Alt Bilgi Çubuğu -->
-      <div class="bg-white border-t border-slate-300 px-4 py-2.5 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
-        <div>
-          💡 <b>İpucu:</b> Tarih aralıklarını seçtiğinizde gün sayıları ve <b>Kalan İzin</b> bakiyesi otomatik hesaplanır. <b>"İaşeye İşle"</b> butonu seçilen tarihleri ilgili ayların İaşe Listesine <b>İ</b> olarak işler.
+          <!-- GÖRSELİN ALTINDAKİ NOTLAR VE TATİLLER BÖLÜMÜ (BİREBİR) -->
+          <div class="p-3 bg-white border-t-2 border-slate-900 text-[11px] leading-relaxed space-y-2">
+            <div>
+              <div class="font-extrabold text-red-600 underline">NOTLAR</div>
+              <div class="font-bold text-red-600">
+                1. AYNI VARDİYA DÖNEMİNE 4'TEN FAZLA KILAVUZ KAPTANIN İZİN TALEBİNDE BULUNMASI DURUMUNDA;
+              </div>
+              <div class="pl-4 font-semibold text-red-600">
+                a) izin kullanacak kişilerin kendi aralarındaki mutabakatı ile ya da<br>
+                b) kura çekilerek izin kullanacak kişiler belirlenecektir
+              </div>
+              <div class="font-bold text-amber-700 mt-1">
+                2. İLK AŞAMADA HEM YAZ PERİYODUNDA HEM DE KIŞ PERİYODUNDA TEK SEFER İZİN KULLANILACAKTIR (2026 YILI İZNİ İÇİN DAHA SONRA MÜSAİTLİK OLAN YERLERE İKİNCİ KIŞ İZNİ YAZILABİLİR)
+              </div>
+            </div>
+
+            <div>
+              <div class="font-extrabold text-sky-700 underline">TATİLLER</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 font-bold text-sky-700">
+                <div>1. &nbsp;16 - 30 OCAK 2026 / YARI YIL TATİLİ</div>
+                <div>5. &nbsp;26 HAZİRAN - 12 EYLÜL 2026 / YAZ TATİLİ</div>
+                <div>2. &nbsp;16 - 20 MART 2026 / BAHAR ARA TATİLİ</div>
+                <div>6. &nbsp;09 - 13 KASIM 2026 / MUHTEMEL GÜZ ARA TATİLİ</div>
+                <div>3. &nbsp;19 - 22 MART 2026 / RAMAZAN BAYRAMI</div>
+                <div>7. &nbsp;18 - 22 OCAK 2027 / MUHTEMEL 2027 YARIYIL TATİLİ</div>
+                <div>4. &nbsp;26 - 30 MAYIS 2026 / KURBAN BAYRAMI</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="annualPlanSummary" class="font-extrabold text-slate-900"></div>
+
+        <!-- Kaptan Bazlı Yazılan İzin Özeti Kartı -->
+        <div class="max-w-6xl mx-auto mt-3 bg-white border border-slate-300 rounded-xl p-3 shadow-xs">
+          <div class="text-xs font-extrabold text-slate-900 mb-2">📋 Kılavuz Kaptan Bazlı Yazılan Yıllık İzin Özeti (Canlı Kontrol)</div>
+          <div id="pilotPlanChips" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 text-[11px]"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -510,7 +548,7 @@
 
       <div class="space-y-2.5 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Personel (Kılavuz / Stajyer)</label>
+          <label class="block font-bold text-slate-700 mb-1">Personel (2. Vardiya Kılavuz / Stajyer)</label>
           <select id="bulkPilotSelect" class="w-full border border-slate-300 rounded-xl px-2.5 py-2 font-bold"></select>
         </div>
 
@@ -549,29 +587,24 @@
     <div class="bg-white rounded-2xl max-w-4xl w-full p-4 shadow-2xl space-y-3 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between border-b pb-2">
         <div>
-          <h3 class="font-extrabold text-slate-900 text-sm">➕ Personel Ekle / Çıkar, Vardiya & İzin Hakları</h3>
+          <h3 class="font-extrabold text-slate-900 text-sm">➕ Personel Ekle / Çıkar & İzin Hakları (Mehmetçik 2. Posta - 2. Vardiya)</h3>
           <p class="text-[11px] text-slate-500">Liste otomatik olarak <b>1. Başkılavuzlar (A-Z) → 2. Kılavuzlar (A-Z) → 3. Stajyerler (A-Z)</b> şeklinde sıralanır.</p>
         </div>
         <button onclick="closeModal('pilotManageModal')" class="text-slate-400 hover:text-slate-700 font-bold text-xl">&times;</button>
       </div>
 
       <div class="bg-emerald-50/80 border border-emerald-200 p-2.5 rounded-xl space-y-2">
-        <div class="text-[11px] font-extrabold text-emerald-900 uppercase">Yeni Personel Ekle</div>
+        <div class="text-[11px] font-extrabold text-emerald-900 uppercase">Yeni Personel Ekle (2. Vardiya)</div>
         <div class="grid grid-cols-12 gap-1.5 text-xs">
           <input id="newSicil" type="text" placeholder="Sicil (52xxx)" class="col-span-4 sm:col-span-2 bg-white border border-slate-300 rounded-lg px-2 py-1.5 font-semibold" />
-          <input id="newName" type="text" placeholder="Adı Soyadı" class="col-span-8 sm:col-span-3 bg-white border border-slate-300 rounded-lg px-2 py-1.5 font-semibold" />
-          <select id="newRole" class="col-span-5 sm:col-span-3 bg-white border border-slate-300 rounded-lg px-1.5 py-1.5 font-bold">
+          <input id="newName" type="text" placeholder="Adı Soyadı" class="col-span-8 sm:col-span-4 bg-white border border-slate-300 rounded-lg px-2 py-1.5 font-semibold" />
+          <select id="newRole" class="col-span-6 sm:col-span-3 bg-white border border-slate-300 rounded-lg px-1.5 py-1.5 font-bold">
             <option value="B.K.Kpt">B.K.Kpt (Başkılavuz)</option>
             <option value="Kılvz.Kpt." selected>Kılvz.Kpt. (Kılavuz)</option>
             <option value="Staj. K. Kpt.">Staj. K. Kpt. (Stajyer)</option>
           </select>
-          <select id="newShift" class="col-span-4 sm:col-span-2 bg-white border border-slate-300 rounded-lg px-1.5 py-1.5 font-semibold">
-            <option value="1">1. Vardiya</option>
-            <option value="2" selected>2. Vardiya</option>
-            <option value="3">3. Vardiya</option>
-          </select>
-          <input id="newLeaveQuota" type="number" placeholder="İzin" value="30" class="col-span-2 sm:col-span-1 bg-white border border-slate-300 rounded-lg px-1 py-1.5 text-center font-bold" title="Başlangıç İzin Hakkı" />
-          <button onclick="addPilot()" class="col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-lg shadow-xs" title="Listeye Ekle">+</button>
+          <input id="newLeaveQuota" type="number" placeholder="İzin" value="30" class="col-span-4 sm:col-span-2 bg-white border border-slate-300 rounded-lg px-1 py-1.5 text-center font-bold" title="Başlangıç İzin Hakkı" />
+          <button onclick="addPilot()" class="col-span-2 sm:col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-lg shadow-xs" title="Listeye Ekle">+</button>
         </div>
       </div>
 
@@ -583,7 +616,6 @@
               <th class="p-2">Sicil</th>
               <th class="p-2">Adı Soyadı</th>
               <th class="p-2">Unvan / Görevi</th>
-              <th class="p-2">Vardiya</th>
               <th class="p-2 text-center">İzin Hakkı</th>
               <th class="p-2 text-center">Kullanılan</th>
               <th class="p-2 text-center">Kalan</th>
@@ -595,7 +627,7 @@
       </div>
 
       <div class="flex justify-between items-center pt-2 border-t text-xs">
-        <button onclick="resetDefaultPilots()" class="text-red-600 hover:underline font-bold">Varsayılan 35 Kişilik Tam Listeyi Geri Yükle</button>
+        <button onclick="resetDefaultPilots()" class="text-red-600 hover:underline font-bold">Varsayılan 2. Posta Tam Listesini Geri Yükle</button>
         <button onclick="closeModal('pilotManageModal')" class="px-4 py-2 rounded-xl bg-slate-800 text-white font-bold">Kapat</button>
       </div>
     </div>
@@ -648,58 +680,96 @@
 
   <script>
     // =========================================================================
-    // 1. VARSAYILAN MEHMETÇİK 2. POSTA 35 KİŞİLİK TAM LİSTE (SAYFA 1 + SAYFA 2)
+    // 1. MEHMETÇİK 2. POSTA TAM LİSTE (TÜMÜ 2. VARDİYA KILAVUZ KAPTANLARI)
     // =========================================================================
     const DEFAULT_PILOTS = [
       // Baş Kılavuz Kaptanlar (B.K.Kpt)
-      { id: "51793", sicil: "51793", name: "Harun DOKUZ", role: "B.K.Kpt", shift: 1, leaveQuota: 30 },
+      { id: "51793", sicil: "51793", name: "Harun DOKUZ", role: "B.K.Kpt", shift: 2, leaveQuota: 30 },
       { id: "51788", sicil: "51788", name: "Cem ERİNÇİN", role: "B.K.Kpt", shift: 2, leaveQuota: 30 },
 
-      // Kılavuz Kaptanlar (Kılvz.Kpt.) - Sayfa 1 + Sayfa 2
-      { id: "52350", sicil: "52350", name: "Adnan Kerem YALÇIN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
-      { id: "52179", sicil: "52179", name: "Ahmet UYGUN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      // Kılavuz Kaptanlar (Kılvz.Kpt.) - Tümü 2. Vardiya
+      { id: "52350", sicil: "52350", name: "Adnan Kerem YALÇIN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52179", sicil: "52179", name: "Ahmet UYGUN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "50976", sicil: "50976", name: "Ali GÜL", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "23078", sicil: "23078", name: "Ali Rıza URAZ", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
-      { id: "53209", sicil: "53209", name: "Berat Erkan ALSANCAK", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
-      { id: "51811", sicil: "51811", name: "Burak Reis YAVUZ", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
-      { id: "51042", sicil: "51042", name: "Bülent MEMİŞ", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
-      { id: "53889", sicil: "53889", name: "Çağlar ALBAYRAK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "53209", sicil: "53209", name: "Berat Erkan ALSANCAK", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "51811", sicil: "51811", name: "Burak Reis YAVUZ", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "51042", sicil: "51042", name: "Bülent MEMİŞ", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "53889", sicil: "53889", name: "Çağlar ALBAYRAK", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "52705", sicil: "52705", name: "Engin POLAT", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "52742", sicil: "52742", name: "Engin ŞİMŞEK", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
-      { id: "53888", sicil: "53888", name: "Erçin GÖNÜLCAN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
-      { id: "52946", sicil: "52946", name: "Ergün ÖZGÜN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
-      { id: "52952", sicil: "52952", name: "Fatih IŞIK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
-      { id: "53758", sicil: "53758", name: "Gökhan KARSLI", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "53888", sicil: "53888", name: "Erçin GÖNÜLCAN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52946", sicil: "52946", name: "Ergün ÖZGÜN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "53001", sicil: "53001", name: "Erkan KAYA", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52952", sicil: "52952", name: "Fatih IŞIK", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "53758", sicil: "53758", name: "Gökhan KARSLI", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "53002", sicil: "53002", name: "Hakan TURAN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "52744", sicil: "52744", name: "Kerem GÜL", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "52940", sicil: "52940", name: "Mehmet Özgün ÜNLÜ", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
-      { id: "52960", sicil: "52960", name: "Mert ATAYILMAZ", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
-      { id: "52570", sicil: "52570", name: "Mertol AKOĞLAN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
-      { id: "51794", sicil: "51794", name: "Murat TURAN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
-      { id: "51805", sicil: "51805", name: "Sunay IRMAK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "52960", sicil: "52960", name: "Mert ATAYILMAZ", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52570", sicil: "52570", name: "Mertol AKOĞLAN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "51794", sicil: "51794", name: "Murat TURAN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "51805", sicil: "51805", name: "Sunay IRMAK", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "52181", sicil: "52181", name: "Şuayip GÜLER", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "52219", sicil: "52219", name: "Şükrü KURUN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
-      { id: "52480", sicil: "52480", name: "Tayfun GÜR", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
-      { id: "52223", sicil: "52223", name: "Toygar SEZGİN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
-      { id: "52935", sicil: "52935", name: "Umut ÇELİK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "52480", sicil: "52480", name: "Tayfun GÜR", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52223", sicil: "52223", name: "Toygar SEZGİN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52935", sicil: "52935", name: "Umut ÇELİK", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "52938", sicil: "52938", name: "Vehbi DEMİR", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
-      { id: "52822", sicil: "52822", name: "Yücel AYAR", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "52822", sicil: "52822", name: "Yücel AYAR", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
 
-      // Stajyer Kılavuz Kaptanlar (Staj. K. Kpt.)
-      { id: "54218", sicil: "54218", name: "Ege TÜRK", role: "Staj. K. Kpt.", shift: 1, leaveQuota: 20 },
+      // Stajyer Kılavuz Kaptanlar (Staj. K. Kpt.) - Tümü 2. Vardiya
+      { id: "54218", sicil: "54218", name: "Ege TÜRK", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 },
       { id: "54223", sicil: "54223", name: "İsmail YAVAŞ", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 },
-      { id: "52185", sicil: "52185", name: "Hakan AYTEKİN", role: "Staj. K. Kpt.", shift: 3, leaveQuota: 20 },
-      { id: "53675", sicil: "53675", name: "Kağan TATLICI", role: "Staj. K. Kpt.", shift: 1, leaveQuota: 20 },
+      { id: "52185", sicil: "52185", name: "Hakan AYTEKİN", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 },
+      { id: "53675", sicil: "53675", name: "Kağan TATLICI", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 },
       { id: "53886", sicil: "53886", name: "Mehmet Burak ÇEVİK", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 },
-      { id: "53760", sicil: "53760", name: "Sertaç YILDIZ", role: "Staj. K. Kpt.", shift: 3, leaveQuota: 20 }
+      { id: "53760", sicil: "53760", name: "Sertaç YILDIZ", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 }
+    ];
+
+    // =========================================================================
+    // 2. GÖRSELDEKİ 30 PERİYOTLUK VARDİYA İZİN ARALIKLARI (ŞUBAT 2026 - ŞUBAT 2027)
+    // =========================================================================
+    const PERIOD_TEMPLATES = [
+      { no: 4,  label: "16 - 20 ŞUBAT",        green: false, sM: 1,  sD: 16, eM: 1,  eD: 20, yOff: 0, eYOff: 0 },
+      { no: 5,  label: "28 ŞUBAT - 04 MART",   green: false, sM: 1,  sD: 28, eM: 2,  eD: 4,  yOff: 0, eYOff: 0 },
+      { no: 6,  label: "12 - 16 MART",         green: false, sM: 2,  sD: 12, eM: 2,  eD: 16, yOff: 0, eYOff: 0 },
+      { no: 7,  label: "24 - 28 MART",         green: false, sM: 2,  sD: 24, eM: 2,  eD: 28, yOff: 0, eYOff: 0 },
+      { no: 8,  label: "05 - 09 NİSAN",        green: false, sM: 3,  sD: 5,  eM: 3,  eD: 9,  yOff: 0, eYOff: 0 },
+      { no: 9,  label: "17 - 21 NİSAN",        green: false, sM: 3,  sD: 17, eM: 3,  eD: 21, yOff: 0, eYOff: 0 },
+      { no: 10, label: "29 NİSAN - 03 MAYIS",  green: false, sM: 3,  sD: 29, eM: 4,  eD: 3,  yOff: 0, eYOff: 0 },
+      { no: 11, label: "11 - 15 MAYIS",        green: false, sM: 4,  sD: 11, eM: 4,  eD: 15, yOff: 0, eYOff: 0 },
+      { no: 12, label: "23 - 27 MAYIS",        green: false, sM: 4,  sD: 23, eM: 4,  eD: 27, yOff: 0, eYOff: 0, holidayNote: "KURBAN BAYRAMI" },
+      { no: 13, label: "04 - 08 HAZİRAN",      green: true,  sM: 5,  sD: 4,  eM: 5,  eD: 8,  yOff: 0, eYOff: 0, summerSpan: true },
+      { no: 14, label: "16 - 20 HAZİRAN",      green: true,  sM: 5,  sD: 16, eM: 5,  eD: 20, yOff: 0, eYOff: 0 },
+      { no: 15, label: "28 HAZİRAN - 02 TEMMUZ", green: true, sM: 5, sD: 28, eM: 6,  eD: 2,  yOff: 0, eYOff: 0 },
+      { no: 16, label: "10 - 14 TEMMUZ",       green: true,  sM: 6,  sD: 10, eM: 6,  eD: 14, yOff: 0, eYOff: 0 },
+      { no: 17, label: "22 - 26 TEMMUZ",       green: true,  sM: 6,  sD: 22, eM: 6,  eD: 26, yOff: 0, eYOff: 0 },
+      { no: 18, label: "03 - 07 AĞUSTOS",      green: true,  sM: 7,  sD: 3,  eM: 7,  eD: 7,  yOff: 0, eYOff: 0 },
+      { no: 19, label: "15 - 19 AĞUSTOS",      green: true,  sM: 7,  sD: 15, eM: 7,  eD: 19, yOff: 0, eYOff: 0 },
+      { no: 20, label: "27 - 31 AĞUSTOS",      green: true,  sM: 7,  sD: 27, eM: 7,  eD: 31, yOff: 0, eYOff: 0 },
+      { no: 21, label: "08 - 12 EYLÜL",        green: true,  sM: 8,  sD: 8,  eM: 8,  eD: 12, yOff: 0, eYOff: 0 },
+      { no: 22, label: "20 - 24 EYLÜL",        green: false, sM: 8,  sD: 20, eM: 8,  eD: 24, yOff: 0, eYOff: 0 },
+      { no: 23, label: "02 - 06 EKİM",         green: false, sM: 9,  sD: 2,  eM: 9,  eD: 6,  yOff: 0, eYOff: 0 },
+      { no: 24, label: "14 - 18 EKİM",         green: false, sM: 9,  sD: 14, eM: 9,  eD: 18, yOff: 0, eYOff: 0 },
+      { no: 25, label: "26 - 30 EKİM",         green: false, sM: 9,  sD: 26, eM: 9,  eD: 30, yOff: 0, eYOff: 0 },
+      { no: 26, label: "07 - 11 KASIM",        green: false, sM: 10, sD: 7,  eM: 10, eD: 11, yOff: 0, eYOff: 0 },
+      { no: 27, label: "19 - 23 KASIM",        green: false, sM: 10, sD: 19, eM: 10, eD: 23, yOff: 0, eYOff: 0 },
+      { no: 28, label: "01 - 05 ARALIK",       green: false, sM: 11, sD: 1,  eM: 11, eD: 5,  yOff: 0, eYOff: 0 },
+      { no: 29, label: "13 - 17 ARALIK",       green: false, sM: 11, sD: 13, eM: 11, eD: 17, yOff: 0, eYOff: 0 },
+      { no: 30, label: "25 - 29 ARALIK",       green: false, sM: 11, sD: 25, eM: 11, eD: 29, yOff: 0, eYOff: 0 },
+      { no: 1,  label: "06 - 10 OCAK",         green: false, sM: 0,  sD: 6,  eM: 0,  eD: 10, yOff: 1, eYOff: 1 },
+      { no: 2,  label: "18 - 22 OCAK",         green: false, sM: 0,  sD: 18, eM: 0,  eD: 22, yOff: 1, eYOff: 1 },
+      { no: 3,  label: "30 OCAK - 03 ŞUBAT",   green: false, sM: 0,  sD: 30, eM: 1,  eD: 3,  yOff: 1, eYOff: 1 }
     ];
 
     const STATUS_CYCLE = ["Ç", "G", "İ", "R", ""];
 
     // =========================================================================
-    // 2. OTOMATİK SIRALAMA MOTORU:
-    //    1) Başkılavuzlar (B.K.Kpt) -> İsim Alfabetik (tr-TR)
-    //    2) Kılavuz Kaptanlar (Kılvz.Kpt.) -> İsim Alfabetik (tr-TR)
-    //    3) Stajyer Kılavuz Kaptanlar (Staj. K. Kpt.) -> İsim Alfabetik (tr-TR)
+    // 3. OTOMATİK SIRALAMA MOTORU:
+    //    1) Başkılavuzlar (B.K.Kpt) -> A-Z
+    //    2) Kılavuz Kaptanlar (Kılvz.Kpt.) -> A-Z
+    //    3) Stajyer Kılavuz Kaptanlar (Staj. K. Kpt.) -> A-Z
     // =========================================================================
     function getRolePriority(role) {
       const r = (role || "").toLowerCase();
@@ -720,34 +790,35 @@
     let storedPilots = JSON.parse(localStorage.getItem("kegm_pilots"));
     if (!storedPilots) {
       storedPilots = structuredClone(DEFAULT_PILOTS);
-    } else if (!localStorage.getItem("kegm_page2_migrated")) {
+    } else {
       const existingIds = new Set(storedPilots.map(p => p.id));
       DEFAULT_PILOTS.forEach(dp => {
         if (!existingIds.has(dp.id)) storedPilots.push(structuredClone(dp));
       });
-      localStorage.setItem("kegm_page2_migrated", "1");
+      // Tüm personeli 2. Vardiya olarak sabitle
+      storedPilots.forEach(p => { p.shift = 2; });
     }
 
     let state = {
       postaTitle: localStorage.getItem("kegm_posta") || "Mehmetçik 2. Posta",
       pilots: sortPilotsList(storedPilots),
       records: JSON.parse(localStorage.getItem("kegm_records")) || {},
-      // annualPlans["2026"]["52181"] = { p1Start:"", p1End:"", p2Start:"", p2End:"", p3Start:"", p3End:"" }
-      annualPlans: JSON.parse(localStorage.getItem("kegm_annual_plans")) || {},
+      // periodGrid["2026"]["p4_0"] = { pilotId: "51042", color: "default" | "blue" | "red" }
+      periodGrid: JSON.parse(localStorage.getItem("kegm_period_grid")) || {},
       myPilotId: localStorage.getItem("kegm_my_pilot") || "",
       firebaseUrl: localStorage.getItem("kegm_firebase_url") || "",
       kegmTrafikUrl: localStorage.getItem("kegm_trafik_url") || "https://suayipguler-ship-it.github.io/Kegm-trafik/"
     };
 
     state.pilots.forEach(p => {
+      p.shift = 2;
       if (typeof p.leaveQuota !== "number") p.leaveQuota = getRolePriority(p.role) === 3 ? 20 : 30;
     });
 
-    let planShiftFilter = "ALL";
     let syncTimer = null;
 
     // =========================================================================
-    // 3. İZİN HAKKI VE KALAN İZİN HESAPLAMA MOTORU
+    // 4. İZİN HAKKI VE KALAN İZİN HESAPLAMA MOTORU
     // =========================================================================
     function getTotalUsedLeaveAcrossAllMonths(pilotId) {
       let totalUsed = 0;
@@ -769,15 +840,15 @@
     }
 
     // =========================================================================
-    // 4. 4 GÜN ÇALIŞMA / 8 GÜN İZİN DÖNGÜ MOTORU (REFERANS: 19 KASIM 2026)
+    // 5. 4 GÜN ÇALIŞMA / 8 GÜN İZİN DÖNGÜ MOTORU (2. VARDİYA - REF: 19 KAS 2026)
     // =========================================================================
-    function getCycleStatusForDate(shiftNumber, year, monthIndex, day) {
+    function getCycleStatusForDate(year, monthIndex, day) {
       const refUTC = Date.UTC(2026, 10, 19);
       const targetUTC = Date.UTC(year, monthIndex, day);
       const diffDays = Math.floor((targetUTC - refUTC) / 86400000);
       const mod12 = ((diffDays % 12) + 12) % 12;
       const activeShift = Math.floor(mod12 / 4) + 1;
-      return Number(shiftNumber) === activeShift ? "Ç" : "İ";
+      return activeShift === 2 ? "Ç" : "İ";
     }
 
     function getDaysInMonth(year, monthIndex) {
@@ -811,13 +882,13 @@
       const monthKey = getMonthKey();
       const totalDays = getDaysInMonth(year, monthIndex);
 
-      if (!confirm(`${year} yılı seçili ayı için tüm personele 19 Kasım referanslı (4 gün görev / 8 gün izin) döngüsü uygulansın mı?`)) return;
+      if (!confirm(`${year} yılı seçili ayı için 2. Vardiya kılavuz kaptanlarına 19 Kasım referanslı (4 gün görev / 8 gün izin) döngüsü uygulansın mı?`)) return;
 
       state.records[monthKey] = {};
       state.pilots.forEach(p => {
         state.records[monthKey][p.id] = {};
         for (let d = 1; d <= totalDays; d++) {
-          state.records[monthKey][p.id][d] = getCycleStatusForDate(p.shift, year, monthIndex, d);
+          state.records[monthKey][p.id][d] = getCycleStatusForDate(year, monthIndex, d);
         }
       });
       persistAndSync();
@@ -844,7 +915,7 @@
     }
 
     // =========================================================================
-    // 5. EKRAN TABLOSU + A4 YATAY 2 SAYFA RESMİ ÇIKTI RENDER İŞLEMLERİ
+    // 6. EKRAN İAŞE TABLOSU + A4 YATAY RESMİ ÇIKTI RENDER
     // =========================================================================
     function renderAll() {
       state.pilots = sortPilotsList(state.pilots);
@@ -866,7 +937,6 @@
 
       populateSelects();
 
-      // 1) EKRAN TABLOSU
       const thead = document.getElementById("iaseThead");
       let dayHeaders = "";
       for (let d = 1; d <= totalDays; d++) {
@@ -933,7 +1003,7 @@
           <tr class="${isMe ? "row-me" : ""}">
             <td class="col-sno">${idx + 1}</td>
             <td class="col-sicil">${pilot.sicil}</td>
-            <td class="col-ad" title="${pilot.name} (V${pilot.shift})">${pilot.name}</td>
+            <td class="col-ad" title="${pilot.name} (2. Vardiya)">${pilot.name}</td>
             <td class="col-gorev ${roleStyle}">${pilot.role}</td>
             ${cellsHtml}
             <td class="col-stat">${calismaText}</td>
@@ -950,7 +1020,7 @@
       const stjSayi = state.pilots.filter(p => getRolePriority(p.role) === 3).length;
 
       document.getElementById("summaryFooter").textContent =
-        `Toplam: ${state.pilots.length} (${bkkSayi} Başkılavuz, ${klvSayi} Kılavuz, ${stjSayi} Stajyer) | Aktif İaşe: ${totalActiveAll} gün | İzin: ${totalLeaveAll} gün`;
+        `Toplam: ${state.pilots.length} (${bkkSayi} Başkılavuz, ${klvSayi} Kılavuz, ${stjSayi} Stajyer — Tümü 2. Vardiya) | Aktif İaşe: ${totalActiveAll} gün | İzin: ${totalLeaveAll} gün`;
 
       renderPrintPages(monthKey, totalDays, dateRangeStr);
       renderMyMobileEditor(monthKey, totalDays);
@@ -1116,7 +1186,7 @@
         : "text-base font-extrabold text-emerald-700";
 
       document.getElementById("myLeaveQuotaInput").value = pilot.leaveQuota ?? 30;
-      document.getElementById("myPilotNameBadge").textContent = `${pilot.name} (${pilot.sicil} • ${pilot.role} • ${pilot.shift}. Vardiya)`;
+      document.getElementById("myPilotNameBadge").textContent = `${pilot.name} (${pilot.sicil} • ${pilot.role} • 2. Vardiya)`;
       document.getElementById("myPilotMonthStats").textContent =
         `Bu Ay: ${cCount} Çalışıyor • ${gCount} Görevli • ${iCount} İzinde • ${rCount} Rotasyon`;
       document.getElementById("mobileDaysGrid").innerHTML = gridHtml;
@@ -1165,307 +1235,255 @@
     }
 
     // =========================================================================
-    // 6. YILLIK İZİN PLANLAMA MODÜLÜ (3 DÖNEM İZİN + ÇAKIŞMA + İAŞEYE AKTARIM)
+    // 7. GÖRSELDEKİ YILLIK İZİN PLANLAMA 2026 MODÜLÜ (ÇOKTAN SEÇMELİ 4 SLOT)
     // =========================================================================
-    function calcInclusiveDays(startStr, endStr) {
-      if (!startStr || !endStr) return 0;
-      const [y1, m1, d1] = startStr.split("-").map(Number);
-      const [y2, m2, d2] = endStr.split("-").map(Number);
-      const t1 = Date.UTC(y1, m1 - 1, d1);
-      const t2 = Date.UTC(y2, m2 - 1, d2);
-      if (t2 < t1) return 0;
-      return Math.floor((t2 - t1) / 86400000) + 1;
-    }
-
     function openAnnualPlanModal() {
       renderAnnualPlanTable();
       openModal("annualPlanModal");
     }
 
-    function setPlanShiftFilter(val) {
-      planShiftFilter = val;
-      ["ALL", 1, 2, 3].forEach(k => {
-        const btn = document.getElementById(`tabShift${k}`);
-        if (!btn) return;
-        if (k === val) {
-          btn.className = "px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-white shadow-xs";
-        } else {
-          btn.className = "px-3 py-1.5 rounded-xl text-xs font-extrabold bg-white text-slate-700 border border-slate-300 hover:bg-sky-50";
-        }
-      });
-      renderAnnualPlanTable();
+    function getYearGrid(year) {
+      if (!state.periodGrid[year]) state.periodGrid[year] = {};
+      return state.periodGrid[year];
     }
 
-    function getPilotAnnualPlan(year, pilotId) {
-      if (!state.annualPlans[year]) state.annualPlans[year] = {};
-      if (!state.annualPlans[year][pilotId]) {
-        state.annualPlans[year][pilotId] = {
-          p1Start: "", p1End: "",
-          p2Start: "", p2End: "",
-          p3Start: "", p3End: ""
-        };
+    function setPeriodSlotPilot(year, periodIdx, slotIdx, pilotId) {
+      const grid = getYearGrid(year);
+      const key = `${periodIdx}_${slotIdx}`;
+      if (!pilotId) {
+        delete grid[key];
+      } else {
+        const prevColor = grid[key]?.color || "default";
+        grid[key] = { pilotId, color: prevColor };
       }
-      return state.annualPlans[year][pilotId];
-    }
-
-    function updateAnnualPlanDate(pilotId, field, value) {
-      const year = document.getElementById("planYearSelect").value;
-      const plan = getPilotAnnualPlan(year, pilotId);
-      plan[field] = value;
-
-      // Eğer başlangıç tarihi seçildiyse ve bitiş boşsa veya başlangıçtan önceyse bitişi başlangıca eşitle
-      if (field.endsWith("Start") && value) {
-        const endField = field.replace("Start", "End");
-        if (!plan[endField] || plan[endField] < value) {
-          plan[endField] = value;
-        }
-      }
-
       persistAndSync();
       renderAnnualPlanTable();
-      if (document.getElementById("conflictCheckDate").value) {
-        checkDateConflicts();
-      }
+    }
+
+    function cyclePeriodSlotColor(year, periodIdx, slotIdx) {
+      const grid = getYearGrid(year);
+      const key = `${periodIdx}_${slotIdx}`;
+      if (!grid[key] || !grid[key].pilotId) return;
+      const order = ["default", "blue", "red"];
+      const cur = grid[key].color || "default";
+      grid[key].color = order[(order.indexOf(cur) + 1) % order.length];
+      persistAndSync();
+      renderAnnualPlanTable();
     }
 
     function renderAnnualPlanTable() {
       const year = document.getElementById("planYearSelect").value;
-      const tbody = document.getElementById("annualPlanTbody");
+      document.getElementById("planModalTitleText").textContent = `izin Planlama ${year}`;
 
-      let filtered = sortPilotsList(state.pilots);
-      if (planShiftFilter !== "ALL") {
-        filtered = filtered.filter(p => Number(p.shift) === Number(planShiftFilter));
-      }
+      const grid = getYearGrid(year);
+      const pilotsSorted = sortPilotsList(state.pilots);
+      const tbody = document.getElementById("excelPlanTbody");
 
-      let totalPlannedAll = 0;
-      let totalRemainingAll = 0;
+      // Her kaptanın bu yıl kaç periyot yazdığını hesapla
+      const pilotPeriodCounts = {};
+      const pilotPeriodLabels = {};
+      pilotsSorted.forEach(p => {
+        pilotPeriodCounts[p.id] = 0;
+        pilotPeriodLabels[p.id] = [];
+      });
 
-      tbody.innerHTML = filtered.map((p, idx) => {
-        const plan = getPilotAnnualPlan(year, p.id);
-        const d1 = calcInclusiveDays(plan.p1Start, plan.p1End);
-        const d2 = calcInclusiveDays(plan.p2Start, plan.p2End);
-        const d3 = calcInclusiveDays(plan.p3Start, plan.p3End);
-        const plannedTotal = d1 + d2 + d3;
-        const quota = Number(p.leaveQuota ?? 30);
-        const kalan = quota - plannedTotal;
+      let filledSlotsTotal = 0;
 
-        totalPlannedAll += plannedTotal;
-        totalRemainingAll += kalan;
+      const rowsHtml = PERIOD_TEMPLATES.map((pt, pIdx) => {
+        const rowBgClass = pt.green ? "row-green" : "row-white";
 
-        const isMe = state.myPilotId === p.id;
-        const shiftBadgeColor =
-          p.shift == 1 ? "bg-sky-100 text-sky-900" :
-          p.shift == 2 ? "bg-emerald-100 text-emerald-900" :
-          "bg-purple-100 text-purple-900";
+        // 2. Sütun: KURBAN BAYRAMI veya 9 satırlık dikey YAZ TATİLİ birleştirmesi (görseldeki gibi)
+        let seasonCellHtml = "";
+        if (pt.summerSpan) {
+          seasonCellHtml = `<td rowspan="9" class="season-banner">YAZ TATİLİ</td>`;
+        } else if (!pt.green) {
+          seasonCellHtml = `<td class="text-center font-extrabold text-[10px] leading-tight text-slate-900">${pt.holidayNote || ""}</td>`;
+        }
+
+        // 4 Kılavuz Kaptan Slotu (Çoktan seçmeli tüm 2. Vardiya kılavuzları)
+        let slotsHtml = "";
+        for (let sIdx = 0; sIdx < 4; sIdx++) {
+          const cellObj = grid[`${pIdx}_${sIdx}`];
+          const selectedId = cellObj?.pilotId || "";
+          const colorType = cellObj?.color || "default";
+
+          if (selectedId && pilotPeriodCounts[selectedId] !== undefined) {
+            pilotPeriodCounts[selectedId]++;
+            pilotPeriodLabels[selectedId].push(`${pt.no}: ${pt.label}`);
+            filledSlotsTotal++;
+          }
+
+          let tdColorClass = "";
+          if (selectedId) {
+            if (colorType === "blue") tdColorClass = "slot-filled-blue";
+            else if (colorType === "red") tdColorClass = "slot-filled-red";
+            else tdColorClass = "slot-filled-default";
+          }
+
+          const optionsHtml = `<option value="">-- Boş (Seçiniz) --</option>` +
+            pilotsSorted.map(p => {
+              const cnt = pilotPeriodCounts[p.id] || 0;
+              return `<option value="${p.id}" ${p.id === selectedId ? "selected" : ""}>${p.name}</option>`;
+            }).join("");
+
+          slotsHtml += `
+            <td class="${tdColorClass}" style="padding:1px 2px;">
+              <div class="flex items-center gap-0.5">
+                <select class="slot-select" onchange="setPeriodSlotPilot('${year}', ${pIdx}, ${sIdx}, this.value)">
+                  ${optionsHtml}
+                </select>
+                ${selectedId ? `<button onclick="cyclePeriodSlotColor('${year}', ${pIdx}, ${sIdx})" title="Hücre Rengini Değiştir (Standart / Mavi / Kırmızı)" class="w-3.5 h-3.5 rounded-full border border-black/40 shrink-0 text-[8px] font-bold bg-white/70 hover:bg-white">●</button>` : ""}
+              </div>
+            </td>
+          `;
+        }
 
         return `
-          <tr class="${isMe ? 'bg-blue-50/70' : 'hover:bg-slate-50'}">
-            <td class="font-bold text-slate-600">${idx + 1}</td>
-            <td><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${shiftBadgeColor}">V${p.shift}</span></td>
-            <td class="font-mono font-semibold">${p.sicil}</td>
-            <td class="text-left pl-2 font-bold text-slate-900 whitespace-nowrap">${p.name}</td>
-            <td class="bg-amber-50/70 font-extrabold text-amber-900">
-              <input type="number" min="0" max="365" value="${quota}" onchange="updatePilotLeaveQuota('${p.id}', this.value); renderAnnualPlanTable();"
-                class="w-12 text-center bg-white border border-amber-300 rounded px-1 py-0.5 font-extrabold" />
-            </td>
-            <td class="bg-orange-50/70 font-extrabold text-orange-800">${plannedTotal}</td>
-            <td class="bg-emerald-50/70 font-extrabold ${kalan < 0 ? 'text-red-600' : 'text-emerald-800'}">${kalan}</td>
-
-            <!-- 1. İZİN DÖNEMİ -->
-            <td><input type="date" value="${plan.p1Start}" onchange="updateAnnualPlanDate('${p.id}', 'p1Start', this.value)" class="plan-input-date" /></td>
-            <td><input type="date" value="${plan.p1End}" onchange="updateAnnualPlanDate('${p.id}', 'p1End', this.value)" class="plan-input-date" /></td>
-            <td class="font-extrabold text-sky-900 bg-sky-50/50">${d1 || "-"}</td>
-
-            <!-- 2. İZİN DÖNEMİ -->
-            <td><input type="date" value="${plan.p2Start}" onchange="updateAnnualPlanDate('${p.id}', 'p2Start', this.value)" class="plan-input-date" /></td>
-            <td><input type="date" value="${plan.p2End}" onchange="updateAnnualPlanDate('${p.id}', 'p2End', this.value)" class="plan-input-date" /></td>
-            <td class="font-extrabold text-indigo-900 bg-indigo-50/50">${d2 || "-"}</td>
-
-            <!-- 3. İZİN DÖNEMİ -->
-            <td><input type="date" value="${plan.p3Start}" onchange="updateAnnualPlanDate('${p.id}', 'p3Start', this.value)" class="plan-input-date" /></td>
-            <td><input type="date" value="${plan.p3End}" onchange="updateAnnualPlanDate('${p.id}', 'p3End', this.value)" class="plan-input-date" /></td>
-            <td class="font-extrabold text-purple-900 bg-purple-50/50">${d3 || "-"}</td>
-
-            <!-- İAŞE ÇİZELGESİNE AKTAR -->
-            <td>
-              <button onclick="syncPilotPlanToIase('${p.id}')" ${plannedTotal === 0 ? 'disabled' : ''}
-                class="px-2 py-1 rounded-lg text-[10px] font-extrabold transition ${plannedTotal > 0 ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}">
-                İaşeye İşle (İ)
-              </button>
-            </td>
+          <tr class="${rowBgClass}">
+            <td class="text-center font-extrabold">${pt.no}</td>
+            ${seasonCellHtml}
+            <td class="font-extrabold whitespace-nowrap px-2">${pt.label}</td>
+            ${slotsHtml}
           </tr>
         `;
       }).join("");
 
-      document.getElementById("annualPlanSummary").textContent =
-        `Görüntülenen: ${filtered.length} Personel | Toplam Planlanan: ${totalPlannedAll} gün | Toplam Kalan: ${totalRemainingAll} gün`;
+      tbody.innerHTML = rowsHtml;
+
+      document.getElementById("planStatsSummary").textContent =
+        `Toplam ${PERIOD_TEMPLATES.length} Periyot (120 Kontenjan) • Dolu: ${filledSlotsTotal} • Boş: ${120 - filledSlotsTotal}`;
+
+      // Alt Kaptan Bazlı Canlı Özet Kartları
+      const chipsHtml = pilotsSorted.map(p => {
+        const list = pilotPeriodLabels[p.id] || [];
+        const isMe = state.myPilotId === p.id;
+        return `
+          <div class="border rounded-lg px-2 py-1.5 flex flex-col justify-between ${isMe ? 'bg-blue-50 border-blue-400' : list.length > 0 ? 'bg-emerald-50/60 border-emerald-300' : 'bg-slate-50 border-slate-200'}">
+            <div class="flex items-center justify-between font-bold text-slate-900">
+              <span class="truncate">${p.name}</span>
+              <span class="px-1.5 py-0.2 rounded text-[10px] ${list.length >= 2 ? 'bg-amber-200 text-amber-950' : list.length === 1 ? 'bg-emerald-200 text-emerald-950' : 'bg-slate-200 text-slate-600'}">${list.length} Periyot</span>
+            </div>
+            <div class="text-[10px] text-slate-600 truncate mt-0.5">${list.length > 0 ? list.join(" | ") : "Henüz izin yazılmadı"}</div>
+          </div>
+        `;
+      }).join("");
+      document.getElementById("pilotPlanChips").innerHTML = chipsHtml;
     }
 
-    // Planlanan 3 izin dönemini otomatik olarak ilgili ayların İaşe çizelgesine 'İ' olarak işler
-    function syncPilotPlanToIase(pilotId) {
-      const year = document.getElementById("planYearSelect").value;
-      const pilot = state.pilots.find(p => p.id === pilotId);
-      const plan = getPilotAnnualPlan(year, pilotId);
-      if (!pilot) return;
+    // Seçilen tüm izin periyotlarını (4 gün veya 5 gün) ilgili ayların İaşe Çizelgesine 'İ' olarak işler
+    function syncAllAnnualPlansToIase() {
+      const yearNum = Number(document.getElementById("planYearSelect").value);
+      const grid = getYearGrid(String(yearNum));
+      let totalAppliedDays = 0;
 
-      const periods = [
-        [plan.p1Start, plan.p1End],
-        [plan.p2Start, plan.p2End],
-        [plan.p3Start, plan.p3End]
-      ];
+      PERIOD_TEMPLATES.forEach((pt, pIdx) => {
+        for (let sIdx = 0; sIdx < 4; sIdx++) {
+          const entry = grid[`${pIdx}_${sIdx}`];
+          if (!entry || !entry.pilotId) continue;
 
-      let appliedCount = 0;
-      periods.forEach(([s, e]) => {
-        if (!s || !e) return;
-        const [y1, m1, d1] = s.split("-").map(Number);
-        const [y2, m2, d2] = e.split("-").map(Number);
-        let cur = Date.UTC(y1, m1 - 1, d1);
-        const end = Date.UTC(y2, m2 - 1, d2);
+          const startUTC = Date.UTC(yearNum + pt.yOff, pt.sM, pt.sD);
+          const endUTC = Date.UTC(yearNum + pt.eYOff, pt.eM, pt.eD);
+          let cur = startUTC;
 
-        while (cur <= end) {
-          const dt = new Date(cur);
-          const yy = dt.getUTCFullYear();
-          const mmIdx = dt.getUTCMonth();
-          const dd = dt.getUTCDate();
-          const mKey = `${yy}-${String(mmIdx + 1).padStart(2, "0")}`;
-          ensureMonthData(mKey, yy, mmIdx);
-          state.records[mKey][pilotId][dd] = "İ";
-          appliedCount++;
-          cur += 86400000;
+          while (cur <= endUTC) {
+            const dt = new Date(cur);
+            const yy = dt.getUTCFullYear();
+            const mmIdx = dt.getUTCMonth();
+            const dd = dt.getUTCDate();
+            const mKey = `${yy}-${String(mmIdx + 1).padStart(2, "0")}`;
+            ensureMonthData(mKey, yy, mmIdx);
+            state.records[mKey][entry.pilotId][dd] = "İ";
+            totalAppliedDays++;
+            cur += 86400000;
+          }
         }
       });
 
-      if (appliedCount > 0) {
-        persistAndSync();
-        renderAll();
-        alert(`${pilot.name} için planlanan toplam ${appliedCount} izin günü ilgili ayların İaşe çizelgesine 'İ' olarak işlendi.`);
+      if (totalAppliedDays === 0) {
+        alert("Henüz planlama tablosunda seçilmiş bir izin periyodu bulunmuyor.");
+        return;
       }
-    }
 
-    // Seçilen tarihte her vardiyada kaç kişinin izinli olduğunu kontrol et
-    function checkDateConflicts() {
-      const dateStr = document.getElementById("conflictCheckDate").value;
-      const badge = document.getElementById("conflictResultBadge");
-      if (!dateStr) return;
-
-      const year = dateStr.split("-")[0];
-      const byShift = { 1: [], 2: [], 3: [] };
-
-      state.pilots.forEach(p => {
-        const plan = getPilotAnnualPlan(year, p.id);
-        const in1 = plan.p1Start && plan.p1End && dateStr >= plan.p1Start && dateStr <= plan.p1End;
-        const in2 = plan.p2Start && plan.p2End && dateStr >= plan.p2Start && dateStr <= plan.p2End;
-        const in3 = plan.p3Start && plan.p3End && dateStr >= plan.p3Start && dateStr <= plan.p3End;
-        if (in1 || in2 || in3) {
-          byShift[p.shift]?.push(p.name);
-        }
-      });
-
-      badge.innerHTML = `
-        <span class="px-2 py-0.5 rounded ${byShift[1].length >= 3 ? 'bg-red-100 text-red-800' : 'bg-sky-100 text-sky-900'}">V1: ${byShift[1].length} izinli</span>
-        <span class="px-2 py-0.5 rounded ${byShift[2].length >= 3 ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-900'}">V2: ${byShift[2].length} izinli</span>
-        <span class="px-2 py-0.5 rounded ${byShift[3].length >= 3 ? 'bg-red-100 text-red-800' : 'bg-purple-100 text-purple-900'}">V3: ${byShift[3].length} izinli</span>
-      `;
+      persistAndSync();
+      renderAll();
+      alert(`Yıllık izin planındaki toplam ${totalAppliedDays} izin günü ilgili ayların İaşe Çizelgesine 'İ' olarak işlendi.`);
     }
 
     function exportAnnualPlanExcel() {
       const year = document.getElementById("planYearSelect").value;
-      const wb = XLSX.utils.book_new();
+      const grid = getYearGrid(year);
+      const aoa = [
+        [`KEGM ÇANAKKALE KILAVUZLUK - İZİN PLANLAMA ${year} (${state.postaTitle} - 2. Vardiya)`],
+        ["No", "Dönem", "Tarih Aralığı", "1. Kılavuz Kaptan", "2. Kılavuz Kaptan", "3. Kılavuz Kaptan", "4. Kılavuz Kaptan"]
+      ];
 
-      [1, 2, 3].forEach(shiftNo => {
-        const list = sortPilotsList(state.pilots).filter(p => Number(p.shift) === shiftNo);
-        const aoa = [
-          [`KEGM ÇANAKKALE KILAVUZLUK - ${year} YILI İZİN PLANLAMA LİSTESİ (${shiftNo}. VARDİYA)`],
-          ["S.No", "Sicil", "Adı Soyadı", "Görevi", "Toplam İzin Hakkı", "Planlanan", "Kalan İzin", "1. Başlangıç", "1. Bitiş", "Gün", "2. Başlangıç", "2. Bitiş", "Gün", "3. Başlangıç", "3. Bitiş", "Gün"]
-        ];
-
-        list.forEach((p, idx) => {
-          const plan = getPilotAnnualPlan(year, p.id);
-          const d1 = calcInclusiveDays(plan.p1Start, plan.p1End);
-          const d2 = calcInclusiveDays(plan.p2Start, plan.p2End);
-          const d3 = calcInclusiveDays(plan.p3Start, plan.p3End);
-          const tot = d1 + d2 + d3;
-          const quota = Number(p.leaveQuota ?? 30);
-          aoa.push([
-            idx + 1, p.sicil, p.name, p.role, quota, tot, quota - tot,
-            plan.p1Start || "", plan.p1End || "", d1 || "",
-            plan.p2Start || "", plan.p2End || "", d2 || "",
-            plan.p3Start || "", plan.p3End || "", d3 || ""
-          ]);
+      PERIOD_TEMPLATES.forEach((pt, pIdx) => {
+        const names = [0, 1, 2, 3].map(sIdx => {
+          const id = grid[`${pIdx}_${sIdx}`]?.pilotId;
+          const p = state.pilots.find(x => x.id === id);
+          return p ? p.name : "";
         });
-
-        const ws = XLSX.utils.aoa_to_sheet(aoa);
-        XLSX.utils.book_append_sheet(wb, ws, `${shiftNo}_Vardiya`);
+        aoa.push([pt.no, pt.green ? "YAZ TATİLİ" : (pt.holidayNote || ""), pt.label, ...names]);
       });
 
-      XLSX.writeFile(wb, `KEGM_Yillik_Izin_Planlama_${year}.xlsx`);
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Kilavuz_Kaptan");
+      XLSX.writeFile(wb, `izin_Planlama_${year}.xlsx`);
     }
 
     function printAnnualPlan() {
       const year = document.getElementById("planYearSelect").value;
+      const grid = getYearGrid(year);
       const container = document.getElementById("printPagesContainer");
-      let html = "";
 
-      [1, 2, 3].forEach(shiftNo => {
-        const list = sortPilotsList(state.pilots).filter(p => Number(p.shift) === shiftNo);
-        const rows = list.map((p, i) => {
-          const plan = getPilotAnnualPlan(year, p.id);
-          const d1 = calcInclusiveDays(plan.p1Start, plan.p1End);
-          const d2 = calcInclusiveDays(plan.p2Start, plan.p2End);
-          const d3 = calcInclusiveDays(plan.p3Start, plan.p3End);
-          const tot = d1 + d2 + d3;
-          const quota = Number(p.leaveQuota ?? 30);
-          return `
-            <tr>
-              <td>${i + 1}</td>
-              <td>${p.sicil}</td>
-              <td style="text-align:left !important; padding-left:5px !important;">${p.name}</td>
-              <td>${quota}</td>
-              <td>${tot}</td>
-              <td>${quota - tot}</td>
-              <td>${plan.p1Start || ""}</td><td>${plan.p1End || ""}</td><td>${d1 || ""}</td>
-              <td>${plan.p2Start || ""}</td><td>${plan.p2End || ""}</td><td>${d2 || ""}</td>
-              <td>${plan.p3Start || ""}</td><td>${plan.p3End || ""}</td><td>${d3 || ""}</td>
-            </tr>
-          `;
+      const rows = PERIOD_TEMPLATES.map((pt, pIdx) => {
+        const bg = pt.green ? "background-color:#92d050 !important;" : "background-color:#ffffff !important;";
+        const cols = [0, 1, 2, 3].map(sIdx => {
+          const cell = grid[`${pIdx}_${sIdx}`];
+          const p = cell?.pilotId ? state.pilots.find(x => x.id === cell.pilotId) : null;
+          let cellBg = bg;
+          if (cell?.color === "blue") cellBg = "background-color:#00b0f0 !important;";
+          if (cell?.color === "red") cellBg = "background-color:#c0504d !important;";
+          return `<td style="${cellBg} font-weight:700;">${p ? p.name : ""}</td>`;
         }).join("");
 
-        html += `
-          <div class="print-page">
-            <div style="text-align:center; font-weight:800; font-size:13px; margin-bottom:6px; border-bottom:1.5px solid #000; padding-bottom:4px;">
-              KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ — ${year} YILI YILLIK İZİN PLANLAMA LİSTESİ (${shiftNo}. VARDİYA)
-            </div>
-            <table class="print-iase-table">
-              <thead>
-                <tr>
-                  <th rowspan="2" style="width:26px;">S.No</th>
-                  <th rowspan="2" style="width:45px;">Sicil</th>
-                  <th rowspan="2" style="width:155px;">Adı Soyadı</th>
-                  <th rowspan="2" style="width:42px;">Hak</th>
-                  <th rowspan="2" style="width:45px;">Plan</th>
-                  <th rowspan="2" style="width:42px;">Kalan</th>
-                  <th colspan="3">1. İZİN DÖNEMİ</th>
-                  <th colspan="3">2. İZİN DÖNEMİ</th>
-                  <th colspan="3">3. İZİN DÖNEMİ</th>
-                </tr>
-                <tr>
-                  <th>Başlangıç</th><th>Bitiş</th><th style="width:28px;">Gün</th>
-                  <th>Başlangıç</th><th>Bitiş</th><th style="width:28px;">Gün</th>
-                  <th>Başlangıç</th><th>Bitiş</th><th style="width:28px;">Gün</th>
-                </tr>
-              </thead>
-              <tbody>${rows}</tbody>
-            </table>
-          </div>
+        return `
+          <tr>
+            <td style="${bg} font-weight:800;">${pt.no}</td>
+            <td style="${bg} font-weight:800; font-size:8px;">${pt.green ? "YAZ TATİLİ" : (pt.holidayNote || "")}</td>
+            <td style="${bg} font-weight:800; white-space:nowrap;">${pt.label}</td>
+            ${cols}
+          </tr>
         `;
-      });
+      }).join("");
 
-      container.innerHTML = html;
+      container.innerHTML = `
+        <div class="print-page">
+          <div style="text-align:center; font-weight:800; font-size:12px; margin-bottom:4px;">
+            KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ — İZİN PLANLAMA ${year} (${state.postaTitle} / 2. VARDİYA)
+          </div>
+          <table class="print-iase-table" style="font-size:9px !important;">
+            <thead>
+              <tr>
+                <th style="width:28px;">No</th>
+                <th style="width:72px;">Dönem</th>
+                <th style="width:135px;">Tarih Aralığı</th>
+                <th>1. Kılavuz Kaptan</th>
+                <th>2. Kılavuz Kaptan</th>
+                <th>3. Kılavuz Kaptan</th>
+                <th>4. Kılavuz Kaptan</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
       window.print();
     }
 
     // =========================================================================
-    // 7. İAŞE EXCEL (.XLSX) ÇIKTISI (BİREBİR RESMİ FORMAT: İMZA VAR, KALAN İZİN YOK)
+    // 8. İAŞE EXCEL (.XLSX) ÇIKTISI (BİREBİR RESMİ FORMAT: İMZA VAR, KALAN İZİN YOK)
     // =========================================================================
     function exportExcel() {
       const year = Number(document.getElementById("yearSelect").value);
@@ -1519,7 +1537,7 @@
     }
 
     // =========================================================================
-    // 8. KAPTAN YÖNETİMİ & SEÇİM KUTULARI
+    // 9. KAPTAN YÖNETİMİ & SEÇİM KUTULARI
     // =========================================================================
     function populateSelects() {
       const mySel = document.getElementById("myPilotSelect");
@@ -1527,7 +1545,7 @@
 
       const opts = state.pilots.map((p, i) => {
         const rem = getRemainingLeave(p);
-        return `<option value="${p.id}" ${p.id === state.myPilotId ? "selected" : ""}>${i + 1}. ${p.name} (${p.role} • V${p.shift} • Kalan: ${rem}g)</option>`;
+        return `<option value="${p.id}" ${p.id === state.myPilotId ? "selected" : ""}>${i + 1}. ${p.name} (${p.role} • Kalan: ${rem}g)</option>`;
       }).join("");
 
       mySel.innerHTML = `<option value="">-- Kılavuz Kaptan / Stajyer Seçiniz --</option>` + opts;
@@ -1565,13 +1583,6 @@
                 <option value="Staj. K. Kpt." ${p.role === "Staj. K. Kpt." ? "selected" : ""}>Staj. K. Kpt.</option>
               </select>
             </td>
-            <td class="p-2">
-              <select onchange="updatePilotShift('${p.id}', this.value)" class="border rounded-lg px-1.5 py-1 font-bold">
-                <option value="1" ${p.shift == 1 ? "selected" : ""}>1. Vardiya</option>
-                <option value="2" ${p.shift == 2 ? "selected" : ""}>2. Vardiya</option>
-                <option value="3" ${p.shift == 3 ? "selected" : ""}>3. Vardiya</option>
-              </select>
-            </td>
             <td class="p-2 text-center">
               <input type="number" min="0" max="365" value="${quota}" onchange="updatePilotLeaveQuota('${p.id}', this.value)"
                 class="w-16 border border-amber-400 bg-amber-50 rounded-lg px-1.5 py-1 text-center font-extrabold" />
@@ -1597,15 +1608,6 @@
       }
     }
 
-    function updatePilotShift(id, shift) {
-      const p = state.pilots.find(x => x.id === id);
-      if (p) {
-        p.shift = Number(shift);
-        persistAndSync();
-        renderAll();
-      }
-    }
-
     function updatePilotLeaveQuota(id, val) {
       const p = state.pilots.find(x => x.id === id);
       if (p) {
@@ -1620,7 +1622,6 @@
       const sicil = document.getElementById("newSicil").value.trim();
       const name = document.getElementById("newName").value.trim();
       const role = document.getElementById("newRole").value;
-      const shift = Number(document.getElementById("newShift").value);
       const leaveQuota = Math.max(0, Number(document.getElementById("newLeaveQuota").value) || 30);
 
       if (!sicil || !name) {
@@ -1632,7 +1633,7 @@
         return;
       }
 
-      state.pilots.push({ id: sicil, sicil, name, role, shift, leaveQuota });
+      state.pilots.push({ id: sicil, sicil, name, role, shift: 2, leaveQuota });
       state.pilots = sortPilotsList(state.pilots);
 
       document.getElementById("newSicil").value = "";
@@ -1660,7 +1661,7 @@
     }
 
     function resetDefaultPilots() {
-      if (!confirm("Mehmetçik 2. Posta varsayılan 35 kişilik tam liste (Başkılavuzlar + Kılavuzlar + Stajyerler) geri yüklensin mi?")) return;
+      if (!confirm("Mehmetçik 2. Posta varsayılan 2. Vardiya tam listesi geri yüklensin mi?")) return;
       state.pilots = sortPilotsList(structuredClone(DEFAULT_PILOTS));
       persistAndSync();
       renderPilotManageTable();
@@ -1668,7 +1669,7 @@
     }
 
     // =========================================================================
-    // 9. FIREBASE BULUT SENKRONİZASYONU
+    // 10. FIREBASE BULUT SENKRONİZASYONU
     // =========================================================================
     function getCleanFirebaseBase() {
       return state.firebaseUrl.trim().replace(/\/+$/, "");
@@ -1678,7 +1679,7 @@
       state.pilots = sortPilotsList(state.pilots);
       localStorage.setItem("kegm_pilots", JSON.stringify(state.pilots));
       localStorage.setItem("kegm_records", JSON.stringify(state.records));
-      localStorage.setItem("kegm_annual_plans", JSON.stringify(state.annualPlans));
+      localStorage.setItem("kegm_period_grid", JSON.stringify(state.periodGrid));
       localStorage.setItem("kegm_posta", state.postaTitle);
 
       const base = getCleanFirebaseBase();
@@ -1694,7 +1695,7 @@
             postaTitle: state.postaTitle,
             pilots: state.pilots,
             records: state.records,
-            annualPlans: state.annualPlans,
+            periodGrid: state.periodGrid,
             updatedAt: Date.now()
           })
         });
@@ -1715,11 +1716,12 @@
         if (data && data.pilots && data.records) {
           state.postaTitle = data.postaTitle || state.postaTitle;
           state.pilots = sortPilotsList(data.pilots);
+          state.pilots.forEach(p => { p.shift = 2; });
           state.records = data.records;
-          if (data.annualPlans) state.annualPlans = data.annualPlans;
+          if (data.periodGrid) state.periodGrid = data.periodGrid;
           localStorage.setItem("kegm_pilots", JSON.stringify(state.pilots));
           localStorage.setItem("kegm_records", JSON.stringify(state.records));
-          localStorage.setItem("kegm_annual_plans", JSON.stringify(state.annualPlans));
+          localStorage.setItem("kegm_period_grid", JSON.stringify(state.periodGrid));
           renderAll();
           if (!document.getElementById("annualPlanModal").classList.contains("hidden")) {
             renderAnnualPlanTable();
