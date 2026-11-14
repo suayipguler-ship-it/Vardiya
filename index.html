@@ -29,7 +29,7 @@
       font-size: 11px;
       color: #000000;
       table-layout: fixed;
-      min-width: 1230px;
+      min-width: 1240px;
     }
     .iase-table th,
     .iase-table td {
@@ -37,7 +37,7 @@
       text-align: center;
       vertical-align: middle;
       padding: 2px 1px;
-      height: 24px;
+      height: 23px;
       user-select: none;
     }
     .iase-table th {
@@ -48,7 +48,7 @@
     .iase-table .col-sno { width: 28px; }
     .iase-table .col-sicil { width: 46px; }
     .iase-table .col-ad {
-      width: 170px;
+      width: 175px;
       text-align: left;
       padding-left: 6px;
       font-weight: 600;
@@ -56,7 +56,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .iase-table .col-gorev { width: 58px; font-size: 10px; }
+    .iase-table .col-gorev { width: 66px; font-size: 10px; font-weight: 600; }
     .iase-table .col-gun { width: 23px; cursor: pointer; font-weight: 800; transition: transform 0.08s; }
     .iase-table .col-gun:hover { outline: 2px solid #0284c7; z-index: 2; position: relative; }
     .iase-table .col-stat { width: 46px; font-weight: 700; }
@@ -73,11 +73,15 @@
     .row-me { background-color: #eff6ff !important; }
     .row-me td.col-ad { color: #1d4ed8; font-weight: 800; }
 
-    /* A4 Yatay Resmi Yazdırma Kuralları (Siyah-Beyaz Resmi Belgeye Uyumlu) */
+    /* Unvan Grup Ayracı Vurgusu */
+    .role-bkk { color: #991b1b; font-weight: 800; }
+    .role-staj { color: #4338ca; font-style: italic; }
+
+    /* A4 Yatay Resmi Yazdırma Kuralları */
     @media print {
       @page {
         size: A4 landscape;
-        margin: 6mm;
+        margin: 5mm;
       }
       body {
         background: #ffffff !important;
@@ -96,13 +100,13 @@
       .iase-table {
         min-width: 100% !important;
         width: 100% !important;
-        font-size: 9.5px !important;
+        font-size: 9px !important;
       }
       .iase-table th,
       .iase-table td {
         border: 1px solid #000000 !important;
-        height: 18.5px !important;
-        padding: 1px !important;
+        height: 15.5px !important;
+        padding: 0.5px 1px !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
@@ -116,6 +120,9 @@
       }
       .col-kalan {
         background-color: #f3f4f6 !important;
+        color: #000000 !important;
+      }
+      .role-bkk, .role-staj {
         color: #000000 !important;
       }
     }
@@ -132,7 +139,7 @@
         </div>
         <div>
           <h1 class="text-sm sm:text-base font-extrabold leading-tight tracking-tight">Çanakkale Kılavuzluk Vardiya & İzin Sistemi</h1>
-          <p class="text-[11px] text-sky-200">Mehmetçik 2. Posta • 4 Gün Görev / 8 Gün İzin • Canlı İzin Bakiyesi</p>
+          <p class="text-[11px] text-sky-200">Mehmetçik 2. Posta (35 Personel) • Başkılavuz → Kılavuz (A-Z) → Stajyer (A-Z)</p>
         </div>
       </div>
 
@@ -223,7 +230,7 @@
             </label>
             <select id="myPilotSelect" onchange="selectMyPilot(this.value)"
               class="mt-1 w-full bg-indigo-50/70 border-2 border-indigo-300 rounded-xl px-2.5 py-1.5 text-sm font-extrabold text-indigo-950">
-              <option value="">-- Kılavuz Kaptan Seçiniz --</option>
+              <option value="">-- Kılavuz Kaptan / Stajyer Seçiniz --</option>
             </select>
           </div>
 
@@ -232,14 +239,13 @@
               🗓️ Toplu Gün İşle
             </button>
             <button onclick="openPilotManageModal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl font-bold shadow-sm transition">
-              👥 Kaptanlar & İzin Hakları
+              ➕ Kaptan Ekle / Çıkar
             </button>
           </div>
         </div>
 
         <!-- Seçili Kaptanın Renkli Mobil Gün Şeridi ve İzin Bakiyesi -->
         <div id="myMobileEditor" class="hidden bg-slate-50/90 border border-slate-200 rounded-xl p-3 space-y-2.5">
-          <!-- Üst Bilgi & İzin Bakiye Kutusu -->
           <div class="flex flex-wrap items-center justify-between gap-2 bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
             <div>
               <div id="myPilotNameBadge" class="text-sm font-extrabold text-slate-900"></div>
@@ -264,7 +270,6 @@
             </div>
           </div>
 
-          <!-- Renkli Kod Açıklamaları -->
           <div class="flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
             <span class="text-slate-600 font-medium">Kutuya dokunarak değiştirin:</span>
             <div class="flex flex-wrap items-center gap-1.5">
@@ -276,12 +281,11 @@
             </div>
           </div>
 
-          <!-- Dokunmatik Büyük Gün Kutucukları -->
           <div id="mobileDaysGrid" class="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-15 gap-1.5"></div>
         </div>
 
         <div id="noPilotHint" class="text-xs text-slate-600 bg-gradient-to-r from-indigo-50/60 to-sky-50/60 border border-dashed border-indigo-300 rounded-xl p-3">
-          💡 Telefonunuzdan kendi satırınızı düzenlemek ve <b>kalan izin bakiyenizi</b> yönetmek için yukarıdaki listeden adınızı seçin.
+          💡 Telefonunuzdan kendi satırınızı düzenlemek için yukarıdan adınızı seçin. Listeye yeni kılavuz kaptan/stajyer eklemek veya çıkarmak için <b>➕ Kaptan Ekle / Çıkar</b> butonunu kullanabilirsiniz.
         </div>
       </div>
     </section>
@@ -299,7 +303,7 @@
         </div>
         <div class="text-right">
           <div id="reportPostaLabel" class="text-xs sm:text-sm font-extrabold text-slate-900">Mehmetçik 2. Posta</div>
-          <div class="text-[10px] text-slate-500 no-print">Hücreye tıklayarak Ç / G / İ / R değiştirin</div>
+          <div class="text-[10px] text-slate-500 no-print">Sıralama: Başkılavuz → Kılavuz (A-Z) → Stajyer (A-Z)</div>
         </div>
       </div>
 
@@ -328,7 +332,7 @@
 
       <div class="space-y-2.5 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Kılavuz Kaptan</label>
+          <label class="block font-bold text-slate-700 mb-1">Personel (Kılavuz / Stajyer)</label>
           <select id="bulkPilotSelect" class="w-full border border-slate-300 rounded-xl px-2.5 py-2 font-bold"></select>
         </div>
 
@@ -362,31 +366,39 @@
     </div>
   </div>
 
-  <!-- MODAL 2: KAPTANLAR & İZİN HAKLARI YÖNETİMİ -->
+  <!-- MODAL 2: MANUEL KAPTAN EKLEME, ÇIKARMA & İZİN HAKLARI YÖNETİMİ -->
   <div id="pilotManageModal" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-3">
-    <div class="bg-white rounded-2xl max-w-3xl w-full p-4 shadow-2xl space-y-3 max-h-[88vh] flex flex-col">
+    <div class="bg-white rounded-2xl max-w-4xl w-full p-4 shadow-2xl space-y-3 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between border-b pb-2">
-        <h3 class="font-extrabold text-slate-900 text-sm">👥 Kılavuz Kaptan Listesi, Vardiya & İzin Hakları</h3>
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-sm">➕ Personel Ekle / Çıkar, Vardiya & İzin Hakları</h3>
+          <p class="text-[11px] text-slate-500">Liste otomatik olarak <b>1. Başkılavuzlar (A-Z) → 2. Kılavuzlar (A-Z) → 3. Stajyerler (A-Z)</b> şeklinde sıralanır.</p>
+        </div>
         <button onclick="closeModal('pilotManageModal')" class="text-slate-400 hover:text-slate-700 font-bold text-xl">&times;</button>
       </div>
 
-      <!-- Yeni Kaptan Ekleme -->
-      <div class="grid grid-cols-12 gap-1.5 bg-slate-50 p-2.5 rounded-xl border text-xs">
-        <input id="newSicil" type="text" placeholder="Sicil (52xxx)" class="col-span-2 border rounded-lg px-2 py-1.5 font-semibold" />
-        <input id="newName" type="text" placeholder="Adı Soyadı" class="col-span-4 border rounded-lg px-2 py-1.5 font-semibold" />
-        <select id="newRole" class="col-span-2 border rounded-lg px-1.5 py-1.5 font-semibold">
-          <option value="Kılvz.Kpt.">Kılvz.Kpt.</option>
-          <option value="B.K.Kpt">B.K.Kpt</option>
-        </select>
-        <select id="newShift" class="col-span-2 border rounded-lg px-1.5 py-1.5 font-semibold">
-          <option value="1">1. Vardiya</option>
-          <option value="2" selected>2. Vardiya</option>
-          <option value="3">3. Vardiya</option>
-        </select>
-        <input id="newLeaveQuota" type="number" placeholder="İzin" value="30" class="col-span-1 border rounded-lg px-1.5 py-1.5 text-center font-bold" title="Başlangıç İzin Hakkı" />
-        <button onclick="addPilot()" class="col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-lg">+</button>
+      <!-- Yeni Kaptan / Stajyer Ekleme Formu -->
+      <div class="bg-emerald-50/80 border border-emerald-200 p-2.5 rounded-xl space-y-2">
+        <div class="text-[11px] font-extrabold text-emerald-900 uppercase">Yeni Personel Ekle</div>
+        <div class="grid grid-cols-12 gap-1.5 text-xs">
+          <input id="newSicil" type="text" placeholder="Sicil (52xxx)" class="col-span-4 sm:col-span-2 bg-white border border-slate-300 rounded-lg px-2 py-1.5 font-semibold" />
+          <input id="newName" type="text" placeholder="Adı Soyadı" class="col-span-8 sm:col-span-3 bg-white border border-slate-300 rounded-lg px-2 py-1.5 font-semibold" />
+          <select id="newRole" class="col-span-5 sm:col-span-3 bg-white border border-slate-300 rounded-lg px-1.5 py-1.5 font-bold">
+            <option value="B.K.Kpt">B.K.Kpt (Başkılavuz)</option>
+            <option value="Kılvz.Kpt." selected>Kılvz.Kpt. (Kılavuz)</option>
+            <option value="Staj. K. Kpt.">Staj. K. Kpt. (Stajyer)</option>
+          </select>
+          <select id="newShift" class="col-span-4 sm:col-span-2 bg-white border border-slate-300 rounded-lg px-1.5 py-1.5 font-semibold">
+            <option value="1">1. Vardiya</option>
+            <option value="2" selected>2. Vardiya</option>
+            <option value="3">3. Vardiya</option>
+          </select>
+          <input id="newLeaveQuota" type="number" placeholder="İzin" value="30" class="col-span-2 sm:col-span-1 bg-white border border-slate-300 rounded-lg px-1 py-1.5 text-center font-bold" title="Başlangıç İzin Hakkı" />
+          <button onclick="addPilot()" class="col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-lg shadow-xs" title="Listeye Ekle">+</button>
+        </div>
       </div>
 
+      <!-- Mevcut Personel Tablosu -->
       <div class="overflow-y-auto flex-1 border rounded-xl">
         <table class="w-full text-xs text-left">
           <thead class="bg-slate-100 sticky top-0 border-b">
@@ -394,11 +406,12 @@
               <th class="p-2">S.No</th>
               <th class="p-2">Sicil</th>
               <th class="p-2">Adı Soyadı</th>
+              <th class="p-2">Unvan / Görevi</th>
               <th class="p-2">Vardiya</th>
-              <th class="p-2 text-center">Başlangıç İzin</th>
+              <th class="p-2 text-center">İzin Hakkı</th>
               <th class="p-2 text-center">Kullanılan</th>
-              <th class="p-2 text-center">Kalan İzin</th>
-              <th class="p-2 text-right">İşlem</th>
+              <th class="p-2 text-center">Kalan</th>
+              <th class="p-2 text-right">Çıkar</th>
             </tr>
           </thead>
           <tbody id="pilotManageTbody" class="divide-y"></tbody>
@@ -406,7 +419,7 @@
       </div>
 
       <div class="flex justify-between items-center pt-2 border-t text-xs">
-        <button onclick="resetDefaultPilots()" class="text-red-600 hover:underline font-bold">Varsayılan 28 Kaptanı Geri Yükle</button>
+        <button onclick="resetDefaultPilots()" class="text-red-600 hover:underline font-bold">Varsayılan 35 Kişilik Tam Listeyi Geri Yükle</button>
         <button onclick="closeModal('pilotManageModal')" class="px-4 py-2 rounded-xl bg-slate-800 text-white font-bold">Kapat</button>
       </div>
     </div>
@@ -459,11 +472,14 @@
 
   <script>
     // =========================================================================
-    // 1. VARSAYILAN MEHMETÇİK 2. POSTA 28 KILAVUZ KAPTAN LİSTESİ
+    // 1. VARSAYILAN MEHMETÇİK 2. POSTA 35 KİŞİLİK TAM LİSTE (SAYFA 1 + SAYFA 2)
     // =========================================================================
     const DEFAULT_PILOTS = [
+      // Baş Kılavuz Kaptanlar (B.K.Kpt)
       { id: "51793", sicil: "51793", name: "Harun DOKUZ", role: "B.K.Kpt", shift: 1, leaveQuota: 30 },
       { id: "51788", sicil: "51788", name: "Cem ERİNÇİN", role: "B.K.Kpt", shift: 2, leaveQuota: 30 },
+
+      // Kılavuz Kaptanlar (Kılvz.Kpt.) - Sayfa 1 + Sayfa 2 (Yücel AYAR dahil)
       { id: "52350", sicil: "52350", name: "Adnan Kerem YALÇIN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
       { id: "52179", sicil: "52179", name: "Ahmet UYGUN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
       { id: "50976", sicil: "50976", name: "Ali GÜL", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
@@ -489,30 +505,74 @@
       { id: "52480", sicil: "52480", name: "Tayfun GÜR", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
       { id: "52223", sicil: "52223", name: "Toygar SEZGİN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
       { id: "52935", sicil: "52935", name: "Umut ÇELİK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
-      { id: "52938", sicil: "52938", name: "Vehbi DEMİR", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 }
+      { id: "52938", sicil: "52938", name: "Vehbi DEMİR", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52822", sicil: "52822", name: "Yücel AYAR", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+
+      // Stajyer Kılavuz Kaptanlar (Staj. K. Kpt.) - Sayfa 2 (30-35 arası)
+      { id: "54218", sicil: "54218", name: "Ege TÜRK", role: "Staj. K. Kpt.", shift: 1, leaveQuota: 20 },
+      { id: "54223", sicil: "54223", name: "İsmail YAVAŞ", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 },
+      { id: "52185", sicil: "52185", name: "Hakan AYTEKİN", role: "Staj. K. Kpt.", shift: 3, leaveQuota: 20 },
+      { id: "53675", sicil: "53675", name: "Kağan TATLICI", role: "Staj. K. Kpt.", shift: 1, leaveQuota: 20 },
+      { id: "53886", sicil: "53886", name: "Mehmet Burak ÇEVİK", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 },
+      { id: "53760", sicil: "53760", name: "Sertaç YILDIZ", role: "Staj. K. Kpt.", shift: 3, leaveQuota: 20 }
     ];
 
-    // Sadeleştirilmiş Durum Döngüsü: Ç (Çalışıyor) -> G (Görevli) -> İ (İzinde) -> R (Rotasyon) -> Boş
     const STATUS_CYCLE = ["Ç", "G", "İ", "R", ""];
+
+    // =========================================================================
+    // 2. OTOMATİK SIRALAMA MOTORU:
+    //    1) Başkılavuzlar (B.K.Kpt) -> İsim Alfabetik (tr-TR)
+    //    2) Kılavuz Kaptanlar (Kılvz.Kpt.) -> İsim Alfabetik (tr-TR)
+    //    3) Stajyer Kılavuz Kaptanlar (Staj. K. Kpt.) -> İsim Alfabetik (tr-TR)
+    // =========================================================================
+    function getRolePriority(role) {
+      const r = (role || "").toLowerCase();
+      if (r.includes("b.k") || r.includes("baş")) return 1;
+      if (r.includes("staj")) return 3;
+      return 2; // Kılvz.Kpt.
+    }
+
+    function sortPilotsList(list) {
+      return [...list].sort((a, b) => {
+        const pA = getRolePriority(a.role);
+        const pB = getRolePriority(b.role);
+        if (pA !== pB) return pA - pB;
+        return a.name.localeCompare(b.name, "tr", { sensitivity: "base" });
+      });
+    }
+
+    // Başlangıç verilerini yükle (Eski 28 kişilik önbellek varsa yeni 7 kişiyi otomatik birleştir)
+    let storedPilots = JSON.parse(localStorage.getItem("kegm_pilots"));
+    if (!storedPilots) {
+      storedPilots = structuredClone(DEFAULT_PILOTS);
+    } else {
+      // 2. sayfadaki yeni kişilerin eski önbellekte eksik kalmaması için yalnızca ilk geçişte tamamla
+      if (!localStorage.getItem("kegm_page2_migrated")) {
+        const existingIds = new Set(storedPilots.map(p => p.id));
+        DEFAULT_PILOTS.forEach(dp => {
+          if (!existingIds.has(dp.id)) storedPilots.push(structuredClone(dp));
+        });
+        localStorage.setItem("kegm_page2_migrated", "1");
+      }
+    }
 
     let state = {
       postaTitle: localStorage.getItem("kegm_posta") || "Mehmetçik 2. Posta",
-      pilots: JSON.parse(localStorage.getItem("kegm_pilots")) || structuredClone(DEFAULT_PILOTS),
+      pilots: sortPilotsList(storedPilots),
       records: JSON.parse(localStorage.getItem("kegm_records")) || {},
       myPilotId: localStorage.getItem("kegm_my_pilot") || "",
       firebaseUrl: localStorage.getItem("kegm_firebase_url") || "",
       kegmTrafikUrl: localStorage.getItem("kegm_trafik_url") || "https://suayipguler-ship-it.github.io/Kegm-trafik/"
     };
 
-    // Eski kayıtlarda leaveQuota yoksa 30 olarak tamamla
     state.pilots.forEach(p => {
-      if (typeof p.leaveQuota !== "number") p.leaveQuota = 30;
+      if (typeof p.leaveQuota !== "number") p.leaveQuota = getRolePriority(p.role) === 3 ? 20 : 30;
     });
 
     let syncTimer = null;
 
     // =========================================================================
-    // 2. İZİN HAKKI VE KALAN İZİN HESAPLAMA MOTORU (TÜM KAYITLI AYLAR)
+    // 3. İZİN HAKKI VE KALAN İZİN HESAPLAMA MOTORU
     // =========================================================================
     function getTotalUsedLeaveAcrossAllMonths(pilotId) {
       let totalUsed = 0;
@@ -534,7 +594,7 @@
     }
 
     // =========================================================================
-    // 3. 4 GÜN ÇALIŞMA / 8 GÜN İZİN DÖNGÜ MOTORU (REFERANS: 19 KASIM 2026)
+    // 4. 4 GÜN ÇALIŞMA / 8 GÜN İZİN DÖNGÜ MOTORU (REFERANS: 19 KASIM 2026)
     // =========================================================================
     function getCycleStatusForDate(shiftNumber, year, monthIndex, day) {
       const refUTC = Date.UTC(2026, 10, 19); // 19 Kasım 2026
@@ -576,7 +636,7 @@
       const monthKey = getMonthKey();
       const totalDays = getDaysInMonth(year, monthIndex);
 
-      if (!confirm(`${year} yılı seçili ayı için tüm kaptanlara 19 Kasım referanslı (4 gün görev / 8 gün izin) döngüsü uygulansın mı?`)) return;
+      if (!confirm(`${year} yılı seçili ayı için tüm personele 19 Kasım referanslı (4 gün görev / 8 gün izin) döngüsü uygulansın mı?`)) return;
 
       state.records[monthKey] = {};
       state.pilots.forEach(p => {
@@ -609,9 +669,12 @@
     }
 
     // =========================================================================
-    // 4. TABLO & RENKLİ MOBİL EDİTÖR RENDER İŞLEMLERİ
+    // 5. TABLO & RENKLİ MOBİL EDİTÖR RENDER İŞLEMLERİ
     // =========================================================================
     function renderAll() {
+      // Her render öncesinde sıralama kuralını (Başkılavuz -> Kılavuz A-Z -> Stajyer A-Z) garanti et
+      state.pilots = sortPilotsList(state.pilots);
+
       const year = Number(document.getElementById("yearSelect").value);
       const monthIndex = Number(document.getElementById("monthSelect").value);
       const monthKey = getMonthKey();
@@ -666,7 +729,6 @@
 
         for (let d = 1; d <= totalDays; d++) {
           let val = pRec[d] !== undefined ? pRec[d] : "Ç";
-          // Eski V veya K kaydı kalmışsa temizle
           if (val === "V" || val === "K") val = "Ç";
 
           if (val === "İ") {
@@ -674,7 +736,6 @@
           } else if (val === "") {
             emptyCount++;
           } else {
-            // Ç (Çalışıyor), G (Görevli), R (Rotasyon) aktif iaşe günü sayılır
             workCount++;
           }
 
@@ -695,12 +756,15 @@
         const kalanRenk = remainingLeave < 0 ? "color:#dc2626;" : "";
         const isMe = state.myPilotId === pilot.id;
 
+        const prio = getRolePriority(pilot.role);
+        const roleStyle = prio === 1 ? "role-bkk" : prio === 3 ? "role-staj" : "";
+
         rowsHtml += `
           <tr class="${isMe ? "row-me" : ""}">
             <td class="col-sno">${idx + 1}</td>
             <td class="col-sicil">${pilot.sicil}</td>
             <td class="col-ad" title="${pilot.name} (V${pilot.shift})">${pilot.name}</td>
-            <td class="col-gorev">${pilot.role}</td>
+            <td class="col-gorev ${roleStyle}">${pilot.role}</td>
             ${cellsHtml}
             <td class="col-stat">${calismaText}</td>
             <td class="col-stat">${leaveCount}</td>
@@ -711,8 +775,13 @@
       });
 
       tbody.innerHTML = rowsHtml;
+
+      const bkkSayi = state.pilots.filter(p => getRolePriority(p.role) === 1).length;
+      const klvSayi = state.pilots.filter(p => getRolePriority(p.role) === 2).length;
+      const stjSayi = state.pilots.filter(p => getRolePriority(p.role) === 3).length;
+
       document.getElementById("summaryFooter").textContent =
-        `Toplam Personel: ${state.pilots.length} | Aktif İaşe Günü: ${totalActiveAll} | Bu Ay Kullanılan İzin: ${totalLeaveAll}`;
+        `Toplam: ${state.pilots.length} (${bkkSayi} Başkılavuz, ${klvSayi} Kılavuz, ${stjSayi} Stajyer) | Aktif İaşe: ${totalActiveAll} gün | İzin: ${totalLeaveAll} gün`;
 
       renderMyMobileEditor(monthKey, totalDays);
     }
@@ -768,13 +837,12 @@
         : "text-base font-extrabold text-emerald-700";
 
       document.getElementById("myLeaveQuotaInput").value = pilot.leaveQuota ?? 30;
-      document.getElementById("myPilotNameBadge").textContent = `${pilot.name} (${pilot.sicil} • ${pilot.shift}. Vardiya)`;
+      document.getElementById("myPilotNameBadge").textContent = `${pilot.name} (${pilot.sicil} • ${pilot.role} • ${pilot.shift}. Vardiya)`;
       document.getElementById("myPilotMonthStats").textContent =
         `Bu Ay: ${cCount} Çalışıyor • ${gCount} Görevli • ${iCount} İzinde • ${rCount} Rotasyon`;
       document.getElementById("mobileDaysGrid").innerHTML = gridHtml;
     }
 
-    // Hücreye tıklayınca durum değiştirme (Ç -> G -> İ -> R -> Boş)
     function cycleCell(pilotId, day) {
       const monthKey = getMonthKey();
       let current = state.records[monthKey][pilotId][day] ?? "Ç";
@@ -818,7 +886,7 @@
     }
 
     // =========================================================================
-    // 5. EXCEL (.XLSX) ÇIKTISI
+    // 6. EXCEL (.XLSX) ÇIKTISI
     // =========================================================================
     function exportExcel() {
       const year = Number(document.getElementById("yearSelect").value);
@@ -874,7 +942,7 @@
     }
 
     // =========================================================================
-    // 6. KAPTAN YÖNETİMİ & İZİN BAKİYESİ TABLOSU
+    // 7. MANUEL KAPTAN EKLEME, ÇIKARMA, UNVAN GÜNCELLEME & SIRALAMA
     // =========================================================================
     function populateSelects() {
       const mySel = document.getElementById("myPilotSelect");
@@ -882,10 +950,10 @@
 
       const opts = state.pilots.map((p, i) => {
         const rem = getRemainingLeave(p);
-        return `<option value="${p.id}" ${p.id === state.myPilotId ? "selected" : ""}>${i + 1}. ${p.name} (V${p.shift} • Kalan İzin: ${rem}g)</option>`;
+        return `<option value="${p.id}" ${p.id === state.myPilotId ? "selected" : ""}>${i + 1}. ${p.name} (${p.role} • V${p.shift} • Kalan: ${rem}g)</option>`;
       }).join("");
 
-      mySel.innerHTML = `<option value="">-- Kılavuz Kaptan Seçiniz --</option>` + opts;
+      mySel.innerHTML = `<option value="">-- Kılavuz Kaptan / Stajyer Seçiniz --</option>` + opts;
       bulkSel.innerHTML = opts;
       if (state.myPilotId) bulkSel.value = state.myPilotId;
     }
@@ -902,6 +970,7 @@
     }
 
     function renderPilotManageTable() {
+      state.pilots = sortPilotsList(state.pilots);
       const tbody = document.getElementById("pilotManageTbody");
       tbody.innerHTML = state.pilots.map((p, i) => {
         const used = getTotalUsedLeaveAcrossAllMonths(p.id);
@@ -913,6 +982,13 @@
             <td class="p-2 font-mono">${p.sicil}</td>
             <td class="p-2 font-bold">${p.name}</td>
             <td class="p-2">
+              <select onchange="updatePilotRole('${p.id}', this.value)" class="border rounded-lg px-1.5 py-1 font-semibold">
+                <option value="B.K.Kpt" ${p.role === "B.K.Kpt" ? "selected" : ""}>B.K.Kpt</option>
+                <option value="Kılvz.Kpt." ${p.role === "Kılvz.Kpt." ? "selected" : ""}>Kılvz.Kpt.</option>
+                <option value="Staj. K. Kpt." ${p.role === "Staj. K. Kpt." ? "selected" : ""}>Staj. K. Kpt.</option>
+              </select>
+            </td>
+            <td class="p-2">
               <select onchange="updatePilotShift('${p.id}', this.value)" class="border rounded-lg px-1.5 py-1 font-bold">
                 <option value="1" ${p.shift == 1 ? "selected" : ""}>1. Vardiya</option>
                 <option value="2" ${p.shift == 2 ? "selected" : ""}>2. Vardiya</option>
@@ -923,14 +999,25 @@
               <input type="number" min="0" max="365" value="${quota}" onchange="updatePilotLeaveQuota('${p.id}', this.value)"
                 class="w-16 border border-amber-400 bg-amber-50 rounded-lg px-1.5 py-1 text-center font-extrabold" />
             </td>
-            <td class="p-2 text-center font-bold text-orange-700">${used} gün</td>
-            <td class="p-2 text-center font-extrabold ${rem < 0 ? 'text-red-600' : 'text-emerald-700'}">${rem} gün</td>
+            <td class="p-2 text-center font-bold text-orange-700">${used}g</td>
+            <td class="p-2 text-center font-extrabold ${rem < 0 ? 'text-red-600' : 'text-emerald-700'}">${rem}g</td>
             <td class="p-2 text-right">
-              <button onclick="removePilot('${p.id}')" class="text-red-600 hover:underline font-bold">Sil</button>
+              <button onclick="removePilot('${p.id}')" class="px-2 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-700 font-bold">Çıkar</button>
             </td>
           </tr>
         `;
       }).join("");
+    }
+
+    function updatePilotRole(id, role) {
+      const p = state.pilots.find(x => x.id === id);
+      if (p) {
+        p.role = role;
+        state.pilots = sortPilotsList(state.pilots);
+        persistAndSync();
+        renderPilotManageTable();
+        renderAll();
+      }
     }
 
     function updatePilotShift(id, shift) {
@@ -959,39 +1046,59 @@
       const shift = Number(document.getElementById("newShift").value);
       const leaveQuota = Math.max(0, Number(document.getElementById("newLeaveQuota").value) || 30);
 
-      if (!sicil || !name) return alert("Sicil ve Adı Soyadı zorunludur.");
+      if (!sicil || !name) {
+        alert("Sicil numarası ve Adı Soyadı alanları zorunludur.");
+        return;
+      }
+      if (state.pilots.some(p => p.sicil === sicil)) {
+        alert("Bu sicil numarası listede zaten kayıtlı.");
+        return;
+      }
+
       state.pilots.push({ id: sicil, sicil, name, role, shift, leaveQuota });
+      state.pilots = sortPilotsList(state.pilots);
+
       document.getElementById("newSicil").value = "";
       document.getElementById("newName").value = "";
+
       persistAndSync();
       renderPilotManageTable();
       renderAll();
     }
 
     function removePilot(id) {
-      if (!confirm("Bu kaptan listeden çıkarılsın mı?")) return;
-      state.pilots = state.pilots.filter(p => p.id !== id);
+      const p = state.pilots.find(x => x.id === id);
+      if (!p) return;
+      if (!confirm(`${p.name} (${p.sicil}) listeden tamamen çıkarılsın mı?`)) return;
+
+      state.pilots = state.pilots.filter(x => x.id !== id);
+      if (state.myPilotId === id) {
+        state.myPilotId = "";
+        localStorage.removeItem("kegm_my_pilot");
+      }
+
       persistAndSync();
       renderPilotManageTable();
       renderAll();
     }
 
     function resetDefaultPilots() {
-      if (!confirm("Mehmetçik 2. Posta varsayılan 28 kaptan listesi geri yüklensin mi?")) return;
-      state.pilots = structuredClone(DEFAULT_PILOTS);
+      if (!confirm("Mehmetçik 2. Posta varsayılan 35 kişilik tam liste (Başkılavuzlar + Kılavuzlar + Stajyerler) geri yüklensin mi?")) return;
+      state.pilots = sortPilotsList(structuredClone(DEFAULT_PILOTS));
       persistAndSync();
       renderPilotManageTable();
       renderAll();
     }
 
     // =========================================================================
-    // 7. FIREBASE BULUT SENKRONİZASYONU
+    // 8. FIREBASE BULUT SENKRONİZASYONU
     // =========================================================================
     function getCleanFirebaseBase() {
       return state.firebaseUrl.trim().replace(/\/+$/, "");
     }
 
     async function persistAndSync() {
+      state.pilots = sortPilotsList(state.pilots);
       localStorage.setItem("kegm_pilots", JSON.stringify(state.pilots));
       localStorage.setItem("kegm_records", JSON.stringify(state.records));
       localStorage.setItem("kegm_posta", state.postaTitle);
@@ -1028,7 +1135,7 @@
         const data = await res.json();
         if (data && data.pilots && data.records) {
           state.postaTitle = data.postaTitle || state.postaTitle;
-          state.pilots = data.pilots;
+          state.pilots = sortPilotsList(data.pilots);
           state.records = data.records;
           localStorage.setItem("kegm_pilots", JSON.stringify(state.pilots));
           localStorage.setItem("kegm_records", JSON.stringify(state.records));
