@@ -3,11 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="color-scheme" content="light" />
   <title>KEGM Çanakkale Kılavuzluk - Vardiya & İzin Takip Sistemi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      color-scheme: light;
+    }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 50%, #f8fafc 100%);
@@ -15,7 +19,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Resmi İaşe Listesi Tablosu Stilleri */
+    /* Ekran Tablosu Stilleri (İmza yok, Kalan İzin ekranda görünür) */
     .iase-wrapper {
       overflow-x: auto;
       background: #ffffff;
@@ -29,11 +33,12 @@
       font-size: 11px;
       color: #000000;
       table-layout: fixed;
-      min-width: 1240px;
+      min-width: 1170px;
+      background-color: #ffffff;
     }
     .iase-table th,
     .iase-table td {
-      border: 1px solid #475569;
+      border: 1px solid #334155;
       text-align: center;
       vertical-align: middle;
       padding: 2px 1px;
@@ -48,7 +53,7 @@
     .iase-table .col-sno { width: 28px; }
     .iase-table .col-sicil { width: 46px; }
     .iase-table .col-ad {
-      width: 175px;
+      width: 185px;
       text-align: left;
       padding-left: 6px;
       font-weight: 600;
@@ -56,12 +61,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .iase-table .col-gorev { width: 66px; font-size: 10px; font-weight: 600; }
+    .iase-table .col-gorev { width: 68px; font-size: 10px; font-weight: 600; }
     .iase-table .col-gun { width: 23px; cursor: pointer; font-weight: 800; transition: transform 0.08s; }
     .iase-table .col-gun:hover { outline: 2px solid #0284c7; z-index: 2; position: relative; }
-    .iase-table .col-stat { width: 46px; font-weight: 700; }
-    .iase-table .col-kalan { width: 48px; font-weight: 800; background-color: #fffbeb; color: #b45309; }
-    .iase-table .col-imza { width: 64px; }
+    .iase-table .col-stat { width: 50px; font-weight: 700; }
+    .iase-table .col-kalan { width: 52px; font-weight: 800; background-color: #fffbeb; color: #b45309; }
 
     /* Renkli Canlı Hücre Durumları */
     .cell-C { background-color: #dcfce7; color: #166534; } /* Ç: Çalışıyor - Yeşil */
@@ -73,56 +77,84 @@
     .row-me { background-color: #eff6ff !important; }
     .row-me td.col-ad { color: #1d4ed8; font-weight: 800; }
 
-    /* Unvan Grup Ayracı Vurgusu */
     .role-bkk { color: #991b1b; font-weight: 800; }
     .role-staj { color: #4338ca; font-style: italic; }
 
-    /* A4 Yatay Resmi Yazdırma Kuralları */
+    /* Yazdırma Bölümü (Ekranda Gizli, Sadece A4 Yatay Çıktıda Birebir Resmi Format) */
+    .print-only-container {
+      display: none;
+    }
+
+    /* A4 Yatay Resmi Yazdırma Kuralları (S.No | Sicil | Adı Soyadı | Görevi | TİH | Çalışma | İzin | İmza) */
     @media print {
       @page {
         size: A4 landscape;
-        margin: 5mm;
+        margin: 6mm;
       }
       body {
         background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
+        color: #000000 !important;
       }
-      .no-print {
+      .no-print,
+      .screen-only-table {
         display: none !important;
       }
-      .iase-wrapper {
-        border: none !important;
-        box-shadow: none !important;
-        overflow: visible !important;
-        border-radius: 0 !important;
+      .print-only-container {
+        display: block !important;
       }
-      .iase-table {
-        min-width: 100% !important;
+      .print-page {
+        width: 100%;
+        page-break-after: always;
+        break-after: page;
+      }
+      .print-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      .print-iase-table {
         width: 100% !important;
-        font-size: 9px !important;
+        border-collapse: collapse !important;
+        table-layout: fixed !important;
+        font-size: 9.2px !important;
+        color: #000000 !important;
       }
-      .iase-table th,
-      .iase-table td {
+      .print-iase-table th,
+      .print-iase-table td {
         border: 1px solid #000000 !important;
-        height: 15.5px !important;
-        padding: 0.5px 1px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        height: 17.8px !important;
+        padding: 1px !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      .cell-C, .cell-G, .cell-R {
+      .print-iase-table th {
         background-color: #ffffff !important;
-        color: #000000 !important;
+        font-weight: 700 !important;
       }
-      .cell-I {
+      .print-iase-table .p-sno { width: 23px; }
+      .print-iase-table .p-sicil { width: 39px; }
+      .print-iase-table .p-ad {
+        width: 146px;
+        text-align: left !important;
+        padding-left: 5px !important;
+        font-weight: 600 !important;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .print-iase-table .p-gorev { width: 55px; font-size: 8.5px !important; }
+      .print-iase-table .p-gun { font-weight: 700 !important; }
+      .print-iase-table .p-stat { width: 42px; font-weight: 700 !important; }
+      .print-iase-table .p-imza { width: 64px; }
+
+      .p-cell-I {
         background-color: #d1d5db !important;
         color: #000000 !important;
       }
-      .col-kalan {
-        background-color: #f3f4f6 !important;
-        color: #000000 !important;
-      }
-      .role-bkk, .role-staj {
+      .p-cell-normal {
+        background-color: #ffffff !important;
         color: #000000 !important;
       }
     }
@@ -154,7 +186,7 @@
           📊 Excel
         </button>
         <button onclick="window.print()" class="text-xs bg-sky-500 hover:bg-sky-600 text-white px-3 py-1.5 rounded-lg font-bold shadow transition">
-          🖨️ PDF / Yazdır
+          🖨️ PDF / Yazdır (A4)
         </button>
       </div>
     </div>
@@ -285,25 +317,25 @@
         </div>
 
         <div id="noPilotHint" class="text-xs text-slate-600 bg-gradient-to-r from-indigo-50/60 to-sky-50/60 border border-dashed border-indigo-300 rounded-xl p-3">
-          💡 Telefonunuzdan kendi satırınızı düzenlemek için yukarıdan adınızı seçin. Listeye yeni kılavuz kaptan/stajyer eklemek veya çıkarmak için <b>➕ Kaptan Ekle / Çıkar</b> butonunu kullanabilirsiniz.
+          💡 Telefonunuzdan kendi satırınızı düzenlemek için yukarıdan adınızı seçin. Ay sonu resmi çıktıda <b>Kalan İzin</b> gizlenir ve <b>İmza</b> sütunu otomatik eklenir.
         </div>
       </div>
     </section>
 
-    <!-- RESMİ İAŞE & İZİN TAKİP LİSTESİ TABLOSU -->
-    <section class="iase-wrapper p-2.5 sm:p-3.5">
+    <!-- EKRAN GÖRÜNÜMÜ TABLOSU (İMZA SÜTUNU YOK, KALAN İZİN EKRANDA GÖRÜNÜR) -->
+    <section class="screen-only-table iase-wrapper p-2.5 sm:p-3.5">
       <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2 mb-2">
         <div class="text-left">
           <div class="text-xs sm:text-sm font-extrabold tracking-tight text-slate-900">KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ</div>
           <div class="text-[11px] sm:text-xs font-bold text-slate-700">Gemi Trafik ve Kılavuzluk Dairesi Başkanlığı</div>
         </div>
         <div class="text-center">
-          <div class="text-sm sm:text-base font-extrabold tracking-wide text-slate-900">İAŞE VE İZİN TAKİP LİSTESİ</div>
+          <div class="text-sm sm:text-base font-extrabold tracking-wide text-slate-900">İAŞE LİSTESİ</div>
           <div id="reportDateRange" class="text-xs font-bold text-slate-800">01.11.2026 - 30.11.2026</div>
         </div>
         <div class="text-right">
           <div id="reportPostaLabel" class="text-xs sm:text-sm font-extrabold text-slate-900">Mehmetçik 2. Posta</div>
-          <div class="text-[10px] text-slate-500 no-print">Sıralama: Başkılavuz → Kılavuz (A-Z) → Stajyer (A-Z)</div>
+          <div class="text-[10px] text-slate-500">Sıralama: Başkılavuz → Kılavuz (A-Z) → Stajyer (A-Z)</div>
         </div>
       </div>
 
@@ -319,6 +351,9 @@
         <div id="summaryFooter" class="font-bold text-slate-900"></div>
       </div>
     </section>
+
+    <!-- A4 YATAY RESMİ ÇIKTI KONTEYNERİ (BİREBİR ÖRNEK FORMAT: S.No | Sicil | Adı Soyadı | Görevi | TİH | Çalışma | İzin | İmza) -->
+    <section id="printPagesContainer" class="print-only-container"></section>
 
   </main>
 
@@ -377,7 +412,6 @@
         <button onclick="closeModal('pilotManageModal')" class="text-slate-400 hover:text-slate-700 font-bold text-xl">&times;</button>
       </div>
 
-      <!-- Yeni Kaptan / Stajyer Ekleme Formu -->
       <div class="bg-emerald-50/80 border border-emerald-200 p-2.5 rounded-xl space-y-2">
         <div class="text-[11px] font-extrabold text-emerald-900 uppercase">Yeni Personel Ekle</div>
         <div class="grid grid-cols-12 gap-1.5 text-xs">
@@ -398,7 +432,6 @@
         </div>
       </div>
 
-      <!-- Mevcut Personel Tablosu -->
       <div class="overflow-y-auto flex-1 border rounded-xl">
         <table class="w-full text-xs text-left">
           <thead class="bg-slate-100 sticky top-0 border-b">
@@ -479,7 +512,7 @@
       { id: "51793", sicil: "51793", name: "Harun DOKUZ", role: "B.K.Kpt", shift: 1, leaveQuota: 30 },
       { id: "51788", sicil: "51788", name: "Cem ERİNÇİN", role: "B.K.Kpt", shift: 2, leaveQuota: 30 },
 
-      // Kılavuz Kaptanlar (Kılvz.Kpt.) - Sayfa 1 + Sayfa 2 (Yücel AYAR dahil)
+      // Kılavuz Kaptanlar (Kılvz.Kpt.) - Sayfa 1 + Sayfa 2
       { id: "52350", sicil: "52350", name: "Adnan Kerem YALÇIN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
       { id: "52179", sicil: "52179", name: "Ahmet UYGUN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
       { id: "50976", sicil: "50976", name: "Ali GÜL", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
@@ -508,7 +541,7 @@
       { id: "52938", sicil: "52938", name: "Vehbi DEMİR", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
       { id: "52822", sicil: "52822", name: "Yücel AYAR", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
 
-      // Stajyer Kılavuz Kaptanlar (Staj. K. Kpt.) - Sayfa 2 (30-35 arası)
+      // Stajyer Kılavuz Kaptanlar (Staj. K. Kpt.)
       { id: "54218", sicil: "54218", name: "Ege TÜRK", role: "Staj. K. Kpt.", shift: 1, leaveQuota: 20 },
       { id: "54223", sicil: "54223", name: "İsmail YAVAŞ", role: "Staj. K. Kpt.", shift: 2, leaveQuota: 20 },
       { id: "52185", sicil: "52185", name: "Hakan AYTEKİN", role: "Staj. K. Kpt.", shift: 3, leaveQuota: 20 },
@@ -529,7 +562,7 @@
       const r = (role || "").toLowerCase();
       if (r.includes("b.k") || r.includes("baş")) return 1;
       if (r.includes("staj")) return 3;
-      return 2; // Kılvz.Kpt.
+      return 2;
     }
 
     function sortPilotsList(list) {
@@ -541,19 +574,15 @@
       });
     }
 
-    // Başlangıç verilerini yükle (Eski 28 kişilik önbellek varsa yeni 7 kişiyi otomatik birleştir)
     let storedPilots = JSON.parse(localStorage.getItem("kegm_pilots"));
     if (!storedPilots) {
       storedPilots = structuredClone(DEFAULT_PILOTS);
-    } else {
-      // 2. sayfadaki yeni kişilerin eski önbellekte eksik kalmaması için yalnızca ilk geçişte tamamla
-      if (!localStorage.getItem("kegm_page2_migrated")) {
-        const existingIds = new Set(storedPilots.map(p => p.id));
-        DEFAULT_PILOTS.forEach(dp => {
-          if (!existingIds.has(dp.id)) storedPilots.push(structuredClone(dp));
-        });
-        localStorage.setItem("kegm_page2_migrated", "1");
-      }
+    } else if (!localStorage.getItem("kegm_page2_migrated")) {
+      const existingIds = new Set(storedPilots.map(p => p.id));
+      DEFAULT_PILOTS.forEach(dp => {
+        if (!existingIds.has(dp.id)) storedPilots.push(structuredClone(dp));
+      });
+      localStorage.setItem("kegm_page2_migrated", "1");
     }
 
     let state = {
@@ -669,10 +698,9 @@
     }
 
     // =========================================================================
-    // 5. TABLO & RENKLİ MOBİL EDİTÖR RENDER İŞLEMLERİ
+    // 5. EKRAN TABLOSU + A4 YATAY 2 SAYFA RESMİ ÇIKTI RENDER İŞLEMLERİ
     // =========================================================================
     function renderAll() {
-      // Her render öncesinde sıralama kuralını (Başkılavuz -> Kılavuz A-Z -> Stajyer A-Z) garanti et
       state.pilots = sortPilotsList(state.pilots);
 
       const year = Number(document.getElementById("yearSelect").value);
@@ -684,13 +712,15 @@
 
       const mm = String(monthIndex + 1).padStart(2, "0");
       const ddEnd = String(totalDays).padStart(2, "0");
-      document.getElementById("reportDateRange").textContent = `01.${mm}.${year} - ${ddEnd}.${mm}.${year}`;
+      const dateRangeStr = `01.${mm}.${year} - ${ddEnd}.${mm}.${year}`;
+
+      document.getElementById("reportDateRange").textContent = dateRangeStr;
       document.getElementById("reportPostaLabel").textContent = state.postaTitle;
       document.getElementById("postaTitleInput").value = state.postaTitle;
 
       populateSelects();
 
-      // Tablo Başlığı
+      // 1) EKRAN TABLOSU (İmza yok, Kalan İzin ekranda görünür)
       const thead = document.getElementById("iaseThead");
       let dayHeaders = "";
       for (let d = 1; d <= totalDays; d++) {
@@ -707,14 +737,12 @@
           <th rowspan="2" class="col-stat">Çalışma</th>
           <th rowspan="2" class="col-stat">İzin</th>
           <th rowspan="2" class="col-kalan">Kalan<br>İzin</th>
-          <th rowspan="2" class="col-imza">İmza</th>
         </tr>
         <tr>
           ${dayHeaders}
         </tr>
       `;
 
-      // Tablo Gövdesi
       const tbody = document.getElementById("iaseTbody");
       let rowsHtml = "";
       let totalActiveAll = 0;
@@ -731,13 +759,9 @@
           let val = pRec[d] !== undefined ? pRec[d] : "Ç";
           if (val === "V" || val === "K") val = "Ç";
 
-          if (val === "İ") {
-            leaveCount++;
-          } else if (val === "") {
-            emptyCount++;
-          } else {
-            workCount++;
-          }
+          if (val === "İ") leaveCount++;
+          else if (val === "") emptyCount++;
+          else workCount++;
 
           const cellClass =
             val === "Ç" ? "cell-C" :
@@ -769,7 +793,6 @@
             <td class="col-stat">${calismaText}</td>
             <td class="col-stat">${leaveCount}</td>
             <td class="col-kalan" style="${kalanRenk}">${remainingLeave}</td>
-            <td class="col-imza"></td>
           </tr>
         `;
       });
@@ -783,7 +806,109 @@
       document.getElementById("summaryFooter").textContent =
         `Toplam: ${state.pilots.length} (${bkkSayi} Başkılavuz, ${klvSayi} Kılavuz, ${stjSayi} Stajyer) | Aktif İaşe: ${totalActiveAll} gün | İzin: ${totalLeaveAll} gün`;
 
+      // 2) YAZDIRMA / PDF GÖRÜNÜMÜ (A4 Yatay - Birebir Örnek Format: İmza Var, Kalan İzin Yok, 28 Kişilik Sayfalar)
+      renderPrintPages(monthKey, totalDays, dateRangeStr);
+
+      // 3) MOBİL DÜZENLEYİCİ
       renderMyMobileEditor(monthKey, totalDays);
+    }
+
+    function renderPrintPages(monthKey, totalDays, dateRangeStr) {
+      const container = document.getElementById("printPagesContainer");
+      const PAGE_SIZE = 28; // Örnek sayfa 1: 1-28 arası, Sayfa 2: 29 ve sonrası
+      const chunks = [];
+      for (let i = 0; i < state.pilots.length; i += PAGE_SIZE) {
+        chunks.push(state.pilots.slice(i, i + PAGE_SIZE));
+      }
+      if (chunks.length === 0) chunks.push([]);
+
+      let dayHeaders = "";
+      for (let d = 1; d <= totalDays; d++) {
+        dayHeaders += `<th class="p-gun">${d}</th>`;
+      }
+
+      let pagesHtml = "";
+      chunks.forEach((group, pageIdx) => {
+        const startOffset = pageIdx * PAGE_SIZE;
+        let bodyRows = "";
+
+        group.forEach((pilot, localIdx) => {
+          const globalNo = startOffset + localIdx + 1;
+          const pRec = state.records[monthKey][pilot.id] || {};
+          let workCount = 0;
+          let leaveCount = 0;
+          let emptyCount = 0;
+          let dayCells = "";
+
+          for (let d = 1; d <= totalDays; d++) {
+            let val = pRec[d] !== undefined ? pRec[d] : "Ç";
+            if (val === "V" || val === "K") val = "Ç";
+
+            if (val === "İ") leaveCount++;
+            else if (val === "") emptyCount++;
+            else workCount++;
+
+            const cls = val === "İ" ? "p-cell-I" : "p-cell-normal";
+            dayCells += `<td class="p-gun ${cls}">${val || ""}</td>`;
+          }
+
+          const calismaText = (leaveCount === 0 && emptyCount === 0 && workCount === totalDays) ? "TAM" : workCount;
+
+          bodyRows += `
+            <tr>
+              <td class="p-sno">${globalNo}</td>
+              <td class="p-sicil">${pilot.sicil}</td>
+              <td class="p-ad">${pilot.name}</td>
+              <td class="p-gorev">${pilot.role}</td>
+              ${dayCells}
+              <td class="p-stat">${calismaText}</td>
+              <td class="p-stat">${leaveCount}</td>
+              <td class="p-imza"></td>
+            </tr>
+          `;
+        });
+
+        pagesHtml += `
+          <div class="print-page">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4px; padding-bottom:3px; border-bottom:1.5px solid #000;">
+              <div style="text-align:left; font-weight:700; font-size:10.5px; line-height:1.25;">
+                <div>KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ</div>
+                <div>Gemi Trafik ve Kılavuzluk Dairesi Başkanlığı</div>
+              </div>
+              <div style="text-align:center; font-weight:800; font-size:12px; line-height:1.25;">
+                <div>İAŞE LİSTESİ</div>
+                <div style="font-size:10.5px;">${dateRangeStr}</div>
+              </div>
+              <div style="text-align:right; font-weight:700; font-size:10.5px;">
+                <div>${state.postaTitle}</div>
+              </div>
+            </div>
+
+            <table class="print-iase-table">
+              <thead>
+                <tr>
+                  <th rowspan="2" class="p-sno">S.<br>No</th>
+                  <th rowspan="2" class="p-sicil">Sicil</th>
+                  <th rowspan="2" class="p-ad" style="text-align:center !important;">Adı Soyadı</th>
+                  <th rowspan="2" class="p-gorev">Görevi</th>
+                  <th colspan="${totalDays}">TİH</th>
+                  <th rowspan="2" class="p-stat">Çalışma</th>
+                  <th rowspan="2" class="p-stat">İzin</th>
+                  <th rowspan="2" class="p-imza">İmza</th>
+                </tr>
+                <tr>
+                  ${dayHeaders}
+                </tr>
+              </thead>
+              <tbody>
+                ${bodyRows}
+              </tbody>
+            </table>
+          </div>
+        `;
+      });
+
+      container.innerHTML = pagesHtml;
     }
 
     function renderMyMobileEditor(monthKey, totalDays) {
@@ -886,7 +1011,7 @@
     }
 
     // =========================================================================
-    // 6. EXCEL (.XLSX) ÇIKTISI
+    // 6. EXCEL (.XLSX) ÇIKTISI (BİREBİR RESMİ İAŞE FORMATI: İMZA VAR, KALAN İZİN YOK)
     // =========================================================================
     function exportExcel() {
       const year = Number(document.getElementById("yearSelect").value);
@@ -896,11 +1021,11 @@
       const mm = String(monthIndex + 1).padStart(2, "0");
 
       const aoa = [];
-      aoa.push(["KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ", "", "", "", `İAŞE VE İZİN LİSTESİ (01.${mm}.${year} - ${totalDays}.${mm}.${year})`, ...Array(totalDays - 1).fill(""), state.postaTitle, "", "", ""]);
+      aoa.push(["KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ", "", "", "", `İAŞE LİSTESİ (01.${mm}.${year} - ${totalDays}.${mm}.${year})`, ...Array(totalDays - 1).fill(""), state.postaTitle, "", ""]);
       aoa.push(["Gemi Trafik ve Kılavuzluk Dairesi Başkanlığı"]);
 
-      const header1 = ["S. No", "Sicil", "Adı Soyadı", "Görevi", "TİH", ...Array(totalDays - 1).fill(""), "Çalışma", "İzin", "Kalan İzin", "İmza"];
-      const header2 = ["", "", "", "", ...Array.from({ length: totalDays }, (_, i) => i + 1), "", "", "", ""];
+      const header1 = ["S. No", "Sicil", "Adı Soyadı", "Görevi", "TİH", ...Array(totalDays - 1).fill(""), "Çalışma", "İzin", "İmza"];
+      const header2 = ["", "", "", "", ...Array.from({ length: totalDays }, (_, i) => i + 1), "", "", ""];
       aoa.push(header1);
       aoa.push(header2);
 
@@ -919,8 +1044,7 @@
         }
 
         const calismaStr = (leave === 0 && empty === 0 && work === totalDays) ? "TAM" : work;
-        const remaining = getRemainingLeave(p);
-        aoa.push([idx + 1, p.sicil, p.name, p.role, ...dayVals, calismaStr, leave, remaining, ""]);
+        aoa.push([idx + 1, p.sicil, p.name, p.role, ...dayVals, calismaStr, leave, ""]);
       });
 
       const ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -932,13 +1056,12 @@
         { s: { r: 2, c: 4 }, e: { r: 2, c: 4 + totalDays - 1 } },
         { s: { r: 2, c: 4 + totalDays }, e: { r: 3, c: 4 + totalDays } },
         { s: { r: 2, c: 5 + totalDays }, e: { r: 3, c: 5 + totalDays } },
-        { s: { r: 2, c: 6 + totalDays }, e: { r: 3, c: 6 + totalDays } },
-        { s: { r: 2, c: 7 + totalDays }, e: { r: 3, c: 7 + totalDays } }
+        { s: { r: 2, c: 6 + totalDays }, e: { r: 3, c: 6 + totalDays } }
       ];
 
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Iase_ve_Izin_Listesi");
-      XLSX.writeFile(wb, `KEGM_Iase_Izin_Listesi_${year}_${mm}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, ws, "Iase_Listesi");
+      XLSX.writeFile(wb, `KEGM_Iase_Listesi_${year}_${mm}.xlsx`);
     }
 
     // =========================================================================
