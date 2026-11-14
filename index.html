@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KEGM Çanakkale Kılavuzluk - Vardiya & İaşe Planlama</title>
+  <title>KEGM Çanakkale Kılavuzluk - Vardiya & İzin Takip Sistemi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #f1f5f9;
+      background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 50%, #f8fafc 100%);
       color: #0f172a;
       -webkit-tap-highlight-color: transparent;
     }
@@ -19,9 +19,9 @@
     .iase-wrapper {
       overflow-x: auto;
       background: #ffffff;
-      border: 1px solid #94a3b8;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      border: 1.5px solid #cbd5e1;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
     }
     .iase-table {
       width: 100%;
@@ -29,25 +29,26 @@
       font-size: 11px;
       color: #000000;
       table-layout: fixed;
-      min-width: 1180px;
+      min-width: 1230px;
     }
     .iase-table th,
     .iase-table td {
-      border: 1px solid #334155;
+      border: 1px solid #475569;
       text-align: center;
       vertical-align: middle;
       padding: 2px 1px;
-      height: 22px;
+      height: 24px;
       user-select: none;
     }
     .iase-table th {
-      background-color: #f8fafc;
+      background-color: #f1f5f9;
       font-weight: 700;
+      color: #0f172a;
     }
     .iase-table .col-sno { width: 28px; }
     .iase-table .col-sicil { width: 46px; }
     .iase-table .col-ad {
-      width: 175px;
+      width: 170px;
       text-align: left;
       padding-left: 6px;
       font-weight: 600;
@@ -56,23 +57,23 @@
       text-overflow: ellipsis;
     }
     .iase-table .col-gorev { width: 58px; font-size: 10px; }
-    .iase-table .col-gun { width: 23px; cursor: pointer; font-weight: 700; transition: background 0.1s; }
+    .iase-table .col-gun { width: 23px; cursor: pointer; font-weight: 800; transition: transform 0.08s; }
     .iase-table .col-gun:hover { outline: 2px solid #0284c7; z-index: 2; position: relative; }
     .iase-table .col-stat { width: 46px; font-weight: 700; }
-    .iase-table .col-imza { width: 68px; }
+    .iase-table .col-kalan { width: 48px; font-weight: 800; background-color: #fffbeb; color: #b45309; }
+    .iase-table .col-imza { width: 64px; }
 
-    /* Hücre Durum Renkleri (Resmi Belge Uyumlu) */
-    .cell-C { background-color: #ffffff; color: #0f172a; }
-    .cell-I { background-color: #cbd5e1; color: #0f172a; }
-    .cell-R { background-color: #fef08a; color: #854d0e; }
-    .cell-V { background-color: #bae6fd; color: #075985; }
-    .cell-K { background-color: #fecaca; color: #991b1b; text-decoration: line-through; }
+    /* Renkli Canlı Hücre Durumları */
+    .cell-C { background-color: #dcfce7; color: #166534; } /* Ç: Çalışıyor - Yeşil */
+    .cell-G { background-color: #dbeafe; color: #1e40af; } /* G: Görevli - Mavi */
+    .cell-I { background-color: #fed7aa; color: #9a3412; } /* İ: İzinde - Turuncu */
+    .cell-R { background-color: #f3e8ff; color: #6b21a8; } /* R: Rotasyon - Mor */
     .cell-empty { background-color: #f8fafc; color: #94a3b8; }
 
     .row-me { background-color: #eff6ff !important; }
     .row-me td.col-ad { color: #1d4ed8; font-weight: 800; }
 
-    /* A4 Yatay Resmi Yazdırma Kuralları */
+    /* A4 Yatay Resmi Yazdırma Kuralları (Siyah-Beyaz Resmi Belgeye Uyumlu) */
     @media print {
       @page {
         size: A4 landscape;
@@ -90,6 +91,7 @@
         border: none !important;
         box-shadow: none !important;
         overflow: visible !important;
+        border-radius: 0 !important;
       }
       .iase-table {
         min-width: 100% !important;
@@ -104,42 +106,48 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
+      .cell-C, .cell-G, .cell-R {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+      }
       .cell-I {
         background-color: #d1d5db !important;
+        color: #000000 !important;
       }
-      .print-header-box {
-        display: flex !important;
+      .col-kalan {
+        background-color: #f3f4f6 !important;
+        color: #000000 !important;
       }
     }
   </style>
 </head>
 <body class="pb-12">
 
-  <!-- ÜST BAR (EKRAN) -->
-  <header class="no-print bg-slate-900 text-white sticky top-0 z-30 shadow-md border-b border-slate-700">
+  <!-- ÜST BAR (RENKLİ MARİNE TEMA) -->
+  <header class="no-print bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white sticky top-0 z-30 shadow-lg border-b border-blue-800/60">
     <div class="max-w-7xl mx-auto px-3 py-2.5 flex flex-wrap items-center justify-between gap-2">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-lg bg-sky-600 flex items-center justify-center font-extrabold text-sm tracking-tight shadow">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-extrabold text-sm tracking-tight shadow-md text-white">
           KEGM
         </div>
         <div>
-          <h1 class="text-sm sm:text-base font-bold leading-tight">Çanakkale Kılavuzluk Vardiya & İaşe Sistemi</h1>
-          <p class="text-[11px] text-slate-300">Mehmetçik 2. Posta • 4 Gün Görev / 8 Gün İzin Döngüsü</p>
+          <h1 class="text-sm sm:text-base font-extrabold leading-tight tracking-tight">Çanakkale Kılavuzluk Vardiya & İzin Sistemi</h1>
+          <p class="text-[11px] text-sky-200">Mehmetçik 2. Posta • 4 Gün Görev / 8 Gün İzin • Canlı İzin Bakiyesi</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-1.5">
-        <span id="syncBadge" class="text-[11px] px-2 py-1 rounded-md bg-slate-800 border border-slate-600 text-amber-300 font-medium">
+        <span id="syncBadge" class="text-[11px] px-2.5 py-1 rounded-full bg-white/10 border border-white/20 text-amber-300 font-semibold">
           ● Yerel Mod
         </span>
-        <button onclick="openModal('cloudModal')" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-600 px-2.5 py-1.5 rounded-lg font-medium transition">
-          ☁️ Bulut / Kegm-Trafik
+        <button onclick="openModal('cloudModal')" class="text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1.5 rounded-lg font-semibold transition">
+          ☁️ Bulut / Trafik
         </button>
-        <button onclick="exportExcel()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg font-semibold shadow transition">
-          📊 Excel (.xlsx)
+        <button onclick="exportExcel()" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg font-bold shadow transition">
+          📊 Excel
         </button>
-        <button onclick="window.print()" class="text-xs bg-sky-600 hover:bg-sky-500 text-white px-3 py-1.5 rounded-lg font-semibold shadow transition">
-          🖨️ PDF / Yazdır (A4)
+        <button onclick="window.print()" class="text-xs bg-sky-500 hover:bg-sky-600 text-white px-3 py-1.5 rounded-lg font-bold shadow transition">
+          🖨️ PDF / Yazdır
         </button>
       </div>
     </div>
@@ -147,16 +155,16 @@
 
   <main class="max-w-7xl mx-auto px-3 pt-3 space-y-3">
 
-    <!-- KONTROL PANELİ: AY SEÇİMİ, VARDİYA DÖNGÜSÜ VE TELEFON PROFİLİ -->
+    <!-- KONTROL PANELİ -->
     <section class="no-print grid grid-cols-1 lg:grid-cols-12 gap-3">
 
-      <!-- Sol Kart: Dönem & 4/8 Döngü Otomasyonu -->
-      <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm flex flex-col justify-between space-y-3">
+      <!-- Sol Kart: Dönem Seçimi & 4/8 Vardiya Döngüsü -->
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 p-3.5 shadow-sm flex flex-col justify-between space-y-3">
         <div class="flex items-center justify-between gap-2">
           <div>
             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500">Çizelge Dönemi</label>
             <div class="flex items-center gap-1.5 mt-1">
-              <button onclick="changeMonth(-1)" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold text-slate-700">◀</button>
+              <button onclick="changeMonth(-1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold text-slate-700">◀</button>
               <select id="monthSelect" onchange="renderAll()" class="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm font-bold text-slate-800">
                 <option value="0">Ocak</option>
                 <option value="1">Şubat</option>
@@ -175,7 +183,7 @@
                 <option value="2026" selected>2026</option>
                 <option value="2027">2027</option>
               </select>
-              <button onclick="changeMonth(1)" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold text-slate-700">▶</button>
+              <button onclick="changeMonth(1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold text-slate-700">▶</button>
             </div>
           </div>
 
@@ -187,188 +195,209 @@
         </div>
 
         <!-- 19 Kasım Referanslı 4 Gün Çalış / 8 Gün İzin Otomatik Hesaplayıcı -->
-        <div class="bg-sky-50 border border-sky-200 rounded-lg p-2.5 space-y-2">
+        <div class="bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 rounded-xl p-2.5 space-y-2">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-sky-900">🔄 4 Gün Çalışma / 8 Gün İzin Döngüsü</span>
-            <span class="text-[10px] font-semibold bg-sky-200 text-sky-900 px-1.5 py-0.5 rounded">Ref: 19 Kas 2026</span>
+            <span class="text-xs font-extrabold text-sky-950">🔄 4 Gün Çalışma / 8 Gün İzin Otomasyonu</span>
+            <span class="text-[10px] font-bold bg-sky-600 text-white px-2 py-0.5 rounded-full">Ref: 19 Kas 2026</span>
           </div>
-          <p class="text-[11px] text-sky-800 leading-snug">
-            1. Vardiya: <b>19-23 Kas</b> görevde (sonra 8 gün izin). Kaptanların bağlı olduğu vardiyaya (V1/V2/V3) göre tüm ayı otomatik doldurabilirsiniz.
+          <p class="text-[11px] text-sky-900 leading-snug">
+            Vardiya grubuna (V1/V2/V3) göre görev günlerini <b>Ç</b>, istirahat günlerini <b>İ</b> olarak otomatik doldurur veya tüm ayı standart <b>Ç</b> yapar.
           </p>
           <div class="flex flex-wrap gap-1.5">
-            <button onclick="applyCycleToMonth()" class="flex-1 bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold py-1.5 px-2.5 rounded-lg transition">
-              ⚡ 4/8 Döngüsünü Bu Aya Uygula
+            <button onclick="applyCycleToMonth()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2.5 rounded-xl shadow-sm transition">
+              ⚡ 4/8 Döngüsünü Uygula
             </button>
-            <button onclick="fillAllStandard()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold py-1.5 px-2.5 rounded-lg transition">
+            <button onclick="fillAllStandard()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold py-2 px-2.5 rounded-xl transition">
               Tümünü "Ç" Yap
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Sağ Kart: Her Kaptanın Kendi Telefonundan Hızlı Düzenleme Alanı -->
-      <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm space-y-2.5">
+      <!-- Sağ Kart: Kaptan Mobil Profil & İzin Takip Kartı -->
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 p-3.5 shadow-sm space-y-2.5">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <label for="myPilotSelect" class="block text-[11px] font-bold uppercase tracking-wider text-blue-700">
+          <div class="flex-1 min-w-[210px]">
+            <label for="myPilotSelect" class="block text-[11px] font-extrabold uppercase tracking-wider text-indigo-700">
               📱 Ben Kimim? (Kendi Telefonundan Hızlı Düzenle)
             </label>
             <select id="myPilotSelect" onchange="selectMyPilot(this.value)"
-              class="mt-1 w-full sm:w-72 bg-blue-50 border border-blue-300 rounded-lg px-2.5 py-1.5 text-sm font-bold text-blue-950">
+              class="mt-1 w-full bg-indigo-50/70 border-2 border-indigo-300 rounded-xl px-2.5 py-1.5 text-sm font-extrabold text-indigo-950">
               <option value="">-- Kılavuz Kaptan Seçiniz --</option>
             </select>
           </div>
 
           <div class="flex items-center gap-1.5">
-            <button onclick="openBulkModal()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-semibold shadow-sm transition">
-              🗓️ Toplu İzin / Rotasyon / Vardiya İşle
+            <button onclick="openBulkModal()" class="text-xs bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-3 py-2 rounded-xl font-bold shadow-sm transition">
+              🗓️ Toplu Gün İşle
             </button>
-            <button onclick="openPilotManageModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 px-2.5 py-2 rounded-lg font-semibold transition">
-              👥 Kaptanlar
+            <button onclick="openPilotManageModal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl font-bold shadow-sm transition">
+              👥 Kaptanlar & İzin Hakları
             </button>
           </div>
         </div>
 
-        <!-- Seçili Kaptanın Mobil Dokunmatik Gün Şeridi -->
-        <div id="myMobileEditor" class="hidden bg-slate-50 border border-slate-200 rounded-lg p-2.5 space-y-2">
-          <div class="flex flex-wrap items-center justify-between gap-1 text-xs">
-            <span id="myPilotInfoText" class="font-bold text-slate-800"></span>
-            <div class="flex items-center gap-2 text-[11px]">
-              <span class="px-1.5 py-0.5 rounded bg-white border border-slate-300 font-bold">Ç: Çalışır/Görev</span>
-              <span class="px-1.5 py-0.5 rounded bg-slate-300 font-bold">İ: İzinde</span>
-              <span class="px-1.5 py-0.5 rounded bg-yellow-200 font-bold">R: Rotasyon</span>
-              <span class="px-1.5 py-0.5 rounded bg-sky-200 font-bold">V: Vardiya Değ.</span>
-              <span class="px-1.5 py-0.5 rounded bg-red-200 font-bold">K: İlişik Kesik</span>
+        <!-- Seçili Kaptanın Renkli Mobil Gün Şeridi ve İzin Bakiyesi -->
+        <div id="myMobileEditor" class="hidden bg-slate-50/90 border border-slate-200 rounded-xl p-3 space-y-2.5">
+          <!-- Üst Bilgi & İzin Bakiye Kutusu -->
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
+            <div>
+              <div id="myPilotNameBadge" class="text-sm font-extrabold text-slate-900"></div>
+              <div id="myPilotMonthStats" class="text-xs font-semibold text-slate-600 mt-0.5"></div>
+            </div>
+
+            <!-- Manuel İzin Hakkı Girişi & Otomatik Kalan İzin -->
+            <div class="flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-xl px-2.5 py-1.5">
+              <div>
+                <label class="block text-[10px] font-bold text-amber-900 uppercase">Toplam İzin Hakkı</label>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <input id="myLeaveQuotaInput" type="number" min="0" max="365" onchange="updateMyLeaveQuota(this.value)"
+                    class="w-14 bg-white border border-amber-400 rounded-lg px-1.5 py-0.5 text-center text-xs font-extrabold text-slate-900" />
+                  <span class="text-[11px] font-bold text-amber-800">gün</span>
+                </div>
+              </div>
+              <div class="h-8 w-[1px] bg-amber-300"></div>
+              <div class="text-center px-1">
+                <span class="block text-[10px] font-bold text-amber-900 uppercase">Kalan İzin</span>
+                <span id="myRemainingLeaveBadge" class="text-base font-extrabold text-emerald-700">0 gün</span>
+              </div>
             </div>
           </div>
-          <p class="text-[11px] text-slate-500">Gün kutularına dokunarak durumunuzu değiştirin (<b>Ç → İ → R → V → K → -</b>):</p>
-          <div id="mobileDaysGrid" class="grid grid-cols-7 sm:grid-cols-11 md:grid-cols-16 gap-1"></div>
+
+          <!-- Renkli Kod Açıklamaları -->
+          <div class="flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
+            <span class="text-slate-600 font-medium">Kutuya dokunarak değiştirin:</span>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded-md bg-emerald-100 border border-emerald-300 text-emerald-900 font-bold">Ç: Çalışıyor</span>
+              <span class="px-2 py-0.5 rounded-md bg-blue-100 border border-blue-300 text-blue-900 font-bold">G: Görevli</span>
+              <span class="px-2 py-0.5 rounded-md bg-orange-200 border border-orange-300 text-orange-950 font-bold">İ: İzinde</span>
+              <span class="px-2 py-0.5 rounded-md bg-purple-100 border border-purple-300 text-purple-900 font-bold">R: Rotasyon</span>
+              <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-300 text-slate-600 font-bold">-: Boş</span>
+            </div>
+          </div>
+
+          <!-- Dokunmatik Büyük Gün Kutucukları -->
+          <div id="mobileDaysGrid" class="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-15 gap-1.5"></div>
         </div>
 
-        <div id="noPilotHint" class="text-xs text-slate-500 bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3">
-          💡 Telefonunuzdan kendi satırınızı kolayca düzenlemek için yukarıdan adınızı seçin veya aşağıdaki çizelgede herhangi bir gün kutucuğuna doğrudan dokunun.
+        <div id="noPilotHint" class="text-xs text-slate-600 bg-gradient-to-r from-indigo-50/60 to-sky-50/60 border border-dashed border-indigo-300 rounded-xl p-3">
+          💡 Telefonunuzdan kendi satırınızı düzenlemek ve <b>kalan izin bakiyenizi</b> yönetmek için yukarıdaki listeden adınızı seçin.
         </div>
       </div>
     </section>
 
-    <!-- RESMİ İAŞE LİSTESİ TABLOSU (EKRAN + A4 YATAY ÇIKTI) -->
-    <section class="iase-wrapper p-2 sm:p-3">
-      <!-- Resmi Belge Üst Başlığı -->
+    <!-- RESMİ İAŞE & İZİN TAKİP LİSTESİ TABLOSU -->
+    <section class="iase-wrapper p-2.5 sm:p-3.5">
       <div class="flex items-center justify-between border-b-2 border-slate-800 pb-2 mb-2">
         <div class="text-left">
           <div class="text-xs sm:text-sm font-extrabold tracking-tight text-slate-900">KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ</div>
           <div class="text-[11px] sm:text-xs font-bold text-slate-700">Gemi Trafik ve Kılavuzluk Dairesi Başkanlığı</div>
         </div>
         <div class="text-center">
-          <div class="text-sm sm:text-base font-extrabold tracking-wide text-slate-900">İAŞE LİSTESİ</div>
+          <div class="text-sm sm:text-base font-extrabold tracking-wide text-slate-900">İAŞE VE İZİN TAKİP LİSTESİ</div>
           <div id="reportDateRange" class="text-xs font-bold text-slate-800">01.11.2026 - 30.11.2026</div>
         </div>
         <div class="text-right">
           <div id="reportPostaLabel" class="text-xs sm:text-sm font-extrabold text-slate-900">Mehmetçik 2. Posta</div>
-          <div class="text-[10px] text-slate-500 no-print">Hücreye tıklayarak Ç / İ / R / V / K değiştirin</div>
+          <div class="text-[10px] text-slate-500 no-print">Hücreye tıklayarak Ç / G / İ / R değiştirin</div>
         </div>
       </div>
 
-      <!-- Ana Çizelge -->
       <table class="iase-table" id="iaseTable">
         <thead id="iaseThead"></thead>
         <tbody id="iaseTbody"></tbody>
       </table>
 
-      <!-- Alt Açıklama ve Özet -->
-      <div class="mt-2 flex flex-wrap items-center justify-between text-[10px] text-slate-600 gap-2">
+      <div class="mt-2 flex flex-wrap items-center justify-between text-[11px] text-slate-700 gap-2">
         <div>
-          <b>Kısaltmalar:</b> <b>Ç:</b> Çalışır / Görevde &nbsp;|&nbsp; <b>İ:</b> İzinde &nbsp;|&nbsp; <b>R:</b> Rotasyonda &nbsp;|&nbsp; <b>V:</b> Vardiya Değişimi &nbsp;|&nbsp; <b>K:</b> İlişiği Kesildi
+          <b>Kodlar:</b> <b>Ç:</b> Çalışıyor &nbsp;|&nbsp; <b>G:</b> Görevli &nbsp;|&nbsp; <b>İ:</b> İzinde (Kalan izinden düşer) &nbsp;|&nbsp; <b>R:</b> Rotasyonda
         </div>
-        <div id="summaryFooter" class="font-semibold text-slate-800"></div>
+        <div id="summaryFooter" class="font-bold text-slate-900"></div>
       </div>
     </section>
 
   </main>
 
-  <!-- MODAL 1: TOPLU TARİH ARALIĞI / DURUM ATAMA -->
-  <div id="bulkModal" class="no-print fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full p-4 shadow-xl space-y-3">
+  <!-- MODAL 1: TOPLU TARİH ARALIĞI ATAMA -->
+  <div id="bulkModal" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-3">
+    <div class="bg-white rounded-2xl max-w-md w-full p-4 shadow-2xl space-y-3">
       <div class="flex items-center justify-between border-b pb-2">
-        <h3 class="font-bold text-slate-900 text-sm">🗓️ Tarih Aralığı & Durum Güncelle</h3>
-        <button onclick="closeModal('bulkModal')" class="text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
+        <h3 class="font-extrabold text-slate-900 text-sm">🗓️ Toplu Gün / İzin / Görev İşle</h3>
+        <button onclick="closeModal('bulkModal')" class="text-slate-400 hover:text-slate-700 font-bold text-xl">&times;</button>
       </div>
 
       <div class="space-y-2.5 text-xs">
         <div>
           <label class="block font-bold text-slate-700 mb-1">Kılavuz Kaptan</label>
-          <select id="bulkPilotSelect" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-semibold"></select>
+          <select id="bulkPilotSelect" class="w-full border border-slate-300 rounded-xl px-2.5 py-2 font-bold"></select>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Başlangıç Günü</label>
-            <input type="number" id="bulkStartDay" min="1" max="31" value="1" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-semibold" />
+            <input type="number" id="bulkStartDay" min="1" max="31" value="1" class="w-full border border-slate-300 rounded-xl px-2.5 py-2 font-bold" />
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Bitiş Günü</label>
-            <input type="number" id="bulkEndDay" min="1" max="31" value="8" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-semibold" />
+            <input type="number" id="bulkEndDay" min="1" max="31" value="5" class="w-full border border-slate-300 rounded-xl px-2.5 py-2 font-bold" />
           </div>
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">Atanacak Durum</label>
-          <select id="bulkStatusSelect" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-semibold">
-            <option value="Ç">Ç - Çalışır / Görevde</option>
-            <option value="İ" selected>İ - İzinde (İaşe Kesintisi)</option>
+          <select id="bulkStatusSelect" class="w-full border border-slate-300 rounded-xl px-2.5 py-2 font-bold">
+            <option value="Ç">Ç - Çalışıyor</option>
+            <option value="G">G - Görevli</option>
+            <option value="İ" selected>İ - İzinde (Kalan İzinden Düşer)</option>
             <option value="R">R - Rotasyonda</option>
-            <option value="V">V - Vardiyası Değişti</option>
-            <option value="K">K - İlişiği Kesildi (Ay Sonuna Kadar Boş)</option>
-            <option value="">- Boş / Çizelge Dışı</option>
+            <option value="">- Boş</option>
           </select>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Açıklama / Not (İsteğe Bağlı)</label>
-          <input type="text" id="bulkNoteInput" placeholder="Örn: V2'den V1'e geçti / Yıllık izin" class="w-full border border-slate-300 rounded-lg px-2.5 py-2" />
         </div>
       </div>
 
       <div class="flex justify-end gap-2 pt-2 border-t">
-        <button onclick="closeModal('bulkModal')" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold">Vazgeç</button>
-        <button onclick="applyBulkRange()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">Kaydet ve Uygula</button>
+        <button onclick="closeModal('bulkModal')" class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-bold">Vazgeç</button>
+        <button onclick="applyBulkRange()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow">Kaydet ve Uygula</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: KAPTAN LİSTESİ & VARDİYA GRUBU YÖNETİMİ -->
-  <div id="pilotManageModal" class="no-print fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-3">
-    <div class="bg-white rounded-2xl max-w-2xl w-full p-4 shadow-xl space-y-3 max-h-[88vh] flex flex-col">
+  <!-- MODAL 2: KAPTANLAR & İZİN HAKLARI YÖNETİMİ -->
+  <div id="pilotManageModal" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-3">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-4 shadow-2xl space-y-3 max-h-[88vh] flex flex-col">
       <div class="flex items-center justify-between border-b pb-2">
-        <h3 class="font-bold text-slate-900 text-sm">👥 Kılavuz Kaptan Listesi & Vardiya Atamaları (V1 / V2 / V3)</h3>
-        <button onclick="closeModal('pilotManageModal')" class="text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
+        <h3 class="font-extrabold text-slate-900 text-sm">👥 Kılavuz Kaptan Listesi, Vardiya & İzin Hakları</h3>
+        <button onclick="closeModal('pilotManageModal')" class="text-slate-400 hover:text-slate-700 font-bold text-xl">&times;</button>
       </div>
 
       <!-- Yeni Kaptan Ekleme -->
-      <div class="grid grid-cols-12 gap-1.5 bg-slate-50 p-2 rounded-lg border text-xs">
-        <input id="newSicil" type="text" placeholder="Sicil (52xxx)" class="col-span-3 border rounded px-2 py-1.5" />
-        <input id="newName" type="text" placeholder="Adı Soyadı" class="col-span-4 border rounded px-2 py-1.5" />
-        <select id="newRole" class="col-span-2 border rounded px-1.5 py-1.5">
+      <div class="grid grid-cols-12 gap-1.5 bg-slate-50 p-2.5 rounded-xl border text-xs">
+        <input id="newSicil" type="text" placeholder="Sicil (52xxx)" class="col-span-2 border rounded-lg px-2 py-1.5 font-semibold" />
+        <input id="newName" type="text" placeholder="Adı Soyadı" class="col-span-4 border rounded-lg px-2 py-1.5 font-semibold" />
+        <select id="newRole" class="col-span-2 border rounded-lg px-1.5 py-1.5 font-semibold">
           <option value="Kılvz.Kpt.">Kılvz.Kpt.</option>
           <option value="B.K.Kpt">B.K.Kpt</option>
         </select>
-        <select id="newShift" class="col-span-2 border rounded px-1.5 py-1.5">
+        <select id="newShift" class="col-span-2 border rounded-lg px-1.5 py-1.5 font-semibold">
           <option value="1">1. Vardiya</option>
           <option value="2" selected>2. Vardiya</option>
           <option value="3">3. Vardiya</option>
         </select>
-        <button onclick="addPilot()" class="col-span-1 bg-emerald-600 text-white font-bold rounded">+</button>
+        <input id="newLeaveQuota" type="number" placeholder="İzin" value="30" class="col-span-1 border rounded-lg px-1.5 py-1.5 text-center font-bold" title="Başlangıç İzin Hakkı" />
+        <button onclick="addPilot()" class="col-span-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-lg">+</button>
       </div>
 
-      <div class="overflow-y-auto flex-1 border rounded-lg">
+      <div class="overflow-y-auto flex-1 border rounded-xl">
         <table class="w-full text-xs text-left">
           <thead class="bg-slate-100 sticky top-0 border-b">
             <tr>
               <th class="p-2">S.No</th>
               <th class="p-2">Sicil</th>
               <th class="p-2">Adı Soyadı</th>
-              <th class="p-2">Görevi</th>
               <th class="p-2">Vardiya</th>
+              <th class="p-2 text-center">Başlangıç İzin</th>
+              <th class="p-2 text-center">Kullanılan</th>
+              <th class="p-2 text-center">Kalan İzin</th>
               <th class="p-2 text-right">İşlem</th>
             </tr>
           </thead>
@@ -377,53 +406,53 @@
       </div>
 
       <div class="flex justify-between items-center pt-2 border-t text-xs">
-        <button onclick="resetDefaultPilots()" class="text-red-600 hover:underline font-semibold">Varsayılan 28 Kaptanı Geri Yükle</button>
-        <button onclick="closeModal('pilotManageModal')" class="px-4 py-1.5 rounded-lg bg-slate-800 text-white font-bold">Kapat</button>
+        <button onclick="resetDefaultPilots()" class="text-red-600 hover:underline font-bold">Varsayılan 28 Kaptanı Geri Yükle</button>
+        <button onclick="closeModal('pilotManageModal')" class="px-4 py-2 rounded-xl bg-slate-800 text-white font-bold">Kapat</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: FIREBASE BULUT SENKRONİZASYON & KEGM-TRAFİK BAĞLANTISI -->
-  <div id="cloudModal" class="no-print fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-3">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-4 shadow-xl space-y-3 text-xs">
+  <!-- MODAL 3: FIREBASE BULUT SENKRONİZASYON & TRAFİK BAĞLANTISI -->
+  <div id="cloudModal" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-3">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-4 shadow-2xl space-y-3 text-xs">
       <div class="flex items-center justify-between border-b pb-2">
-        <h3 class="font-bold text-slate-900 text-sm">☁️ Bulut Senkronizasyon & Kegm-Trafik Bağlantısı</h3>
-        <button onclick="closeModal('cloudModal')" class="text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
+        <h3 class="font-extrabold text-slate-900 text-sm">☁️ Bulut Senkronizasyon & Kegm-Trafik Bağlantısı</h3>
+        <button onclick="closeModal('cloudModal')" class="text-slate-400 hover:text-slate-700 font-bold text-xl">&times;</button>
       </div>
 
       <p class="text-slate-600 leading-relaxed">
-        Tüm kılavuz kaptanların kendi telefonlarından yaptığı değişikliklerin anında diğer telefonlara düşmesi için <b>Firebase Realtime Database</b> URL'nizi aşağıya kaydedin (ör. <code>https://kegm-planlama-default-rtdb.firebaseio.com</code>).
+        Tüm kılavuz kaptanların telefonlarından yaptığı değişikliklerin ortak görünmesi için <b>Firebase Realtime Database</b> adresinizi bağlayın.
       </p>
 
       <div class="space-y-2">
         <div>
           <label class="block font-bold text-slate-700 mb-1">Firebase Realtime Database URL</label>
           <input id="firebaseUrlInput" type="url" placeholder="https://proje-adi-default-rtdb.firebaseio.com"
-            class="w-full border border-slate-300 rounded-lg px-2.5 py-2 font-mono text-xs" />
+            class="w-full border border-slate-300 rounded-xl px-2.5 py-2 font-mono text-xs" />
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Kegm-Trafik Uygulama Linki (GitHub Pages)</label>
+          <label class="block font-bold text-slate-700 mb-1">Kegm-Trafik Uygulama Linki</label>
           <div class="flex gap-1.5">
             <input id="kegmTrafikUrlInput" type="url" value="https://suayipguler-ship-it.github.io/Kegm-trafik/"
-              class="flex-1 border border-slate-300 rounded-lg px-2.5 py-2 font-mono text-xs" />
+              class="flex-1 border border-slate-300 rounded-xl px-2.5 py-2 font-mono text-xs" />
             <a id="openKegmTrafikBtn" href="https://suayipguler-ship-it.github.io/Kegm-trafik/" target="_blank"
-              class="px-3 py-2 rounded-lg bg-sky-600 text-white font-bold whitespace-nowrap">Aç ↗</a>
+              class="px-3 py-2 rounded-xl bg-sky-600 text-white font-bold whitespace-nowrap">Aç ↗</a>
           </div>
         </div>
       </div>
 
-      <div class="bg-slate-50 border rounded-lg p-2.5 space-y-1.5">
+      <div class="bg-slate-50 border rounded-xl p-2.5 space-y-1.5">
         <div class="font-bold text-slate-700">📲 Kaptanlara Gönderilecek Hızlı Erişim Linki:</div>
         <div class="flex gap-1.5">
-          <input id="shareLinkBox" type="text" readonly class="flex-1 bg-white border rounded px-2 py-1.5 font-mono text-[11px]" />
-          <button onclick="copyShareLink()" class="px-3 py-1.5 bg-slate-800 text-white rounded font-bold">Kopyala</button>
+          <input id="shareLinkBox" type="text" readonly class="flex-1 bg-white border rounded-lg px-2 py-1.5 font-mono text-[11px]" />
+          <button onclick="copyShareLink()" class="px-3 py-1.5 bg-slate-800 text-white rounded-lg font-bold">Kopyala</button>
         </div>
       </div>
 
       <div class="flex justify-end gap-2 pt-2 border-t">
-        <button onclick="closeModal('cloudModal')" class="px-3 py-1.5 rounded-lg border text-slate-700 font-semibold">Kapat</button>
-        <button onclick="saveCloudSettings()" class="px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold">Bağla ve Senkronize Et</button>
+        <button onclick="closeModal('cloudModal')" class="px-3.5 py-2 rounded-xl border text-slate-700 font-bold">Kapat</button>
+        <button onclick="saveCloudSettings()" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold shadow">Bağla ve Senkronize Et</button>
       </div>
     </div>
   </div>
@@ -433,64 +462,86 @@
     // 1. VARSAYILAN MEHMETÇİK 2. POSTA 28 KILAVUZ KAPTAN LİSTESİ
     // =========================================================================
     const DEFAULT_PILOTS = [
-      { id: "51793", sicil: "51793", name: "Harun DOKUZ", role: "B.K.Kpt", shift: 1 },
-      { id: "51788", sicil: "51788", name: "Cem ERİNÇİN", role: "B.K.Kpt", shift: 2 },
-      { id: "52350", sicil: "52350", name: "Adnan Kerem YALÇIN", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "52179", sicil: "52179", name: "Ahmet UYGUN", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "50976", sicil: "50976", name: "Ali GÜL", role: "Kılvz.Kpt.", shift: 2 },
-      { id: "23078", sicil: "23078", name: "Ali Rıza URAZ", role: "Kılvz.Kpt.", shift: 2 },
-      { id: "53209", sicil: "53209", name: "Berat Erkan ALSANCAK", role: "Kılvz.Kpt.", shift: 3 },
-      { id: "51811", sicil: "51811", name: "Burak Reis YAVUZ", role: "Kılvz.Kpt.", shift: 3 },
-      { id: "51042", sicil: "51042", name: "Bülent MEMİŞ", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "53889", sicil: "53889", name: "Çağlar ALBAYRAK", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "52705", sicil: "52705", name: "Engin POLAT", role: "Kılvz.Kpt.", shift: 2 },
-      { id: "52742", sicil: "52742", name: "Engin ŞİMŞEK", role: "Kılvz.Kpt.", shift: 2 },
-      { id: "53888", sicil: "53888", name: "Erçin GÖNÜLCAN", role: "Kılvz.Kpt.", shift: 3 },
-      { id: "52946", sicil: "52946", name: "Ergün ÖZGÜN", role: "Kılvz.Kpt.", shift: 3 },
-      { id: "52952", sicil: "52952", name: "Fatih IŞIK", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "53758", sicil: "53758", name: "Gökhan KARSLI", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "52744", sicil: "52744", name: "Kerem GÜL", role: "Kılvz.Kpt.", shift: 2 },
-      { id: "52940", sicil: "52940", name: "Mehmet Özgün ÜNLÜ", role: "Kılvz.Kpt.", shift: 2 },
-      { id: "52960", sicil: "52960", name: "Mert ATAYILMAZ", role: "Kılvz.Kpt.", shift: 3 },
-      { id: "52570", sicil: "52570", name: "Mertol AKOĞLAN", role: "Kılvz.Kpt.", shift: 3 },
-      { id: "51794", sicil: "51794", name: "Murat TURAN", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "51805", sicil: "51805", name: "Sunay IRMAK", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "52181", sicil: "52181", name: "Şuayip GÜLER", role: "Kılvz.Kpt.", shift: 2 },
-      { id: "52219", sicil: "52219", name: "Şükrü KURUN", role: "Kılvz.Kpt.", shift: 2 },
-      { id: "52480", sicil: "52480", name: "Tayfun GÜR", role: "Kılvz.Kpt.", shift: 3 },
-      { id: "52223", sicil: "52223", name: "Toygar SEZGİN", role: "Kılvz.Kpt.", shift: 3 },
-      { id: "52935", sicil: "52935", name: "Umut ÇELİK", role: "Kılvz.Kpt.", shift: 1 },
-      { id: "52938", sicil: "52938", name: "Vehbi DEMİR", role: "Kılvz.Kpt.", shift: 2 }
+      { id: "51793", sicil: "51793", name: "Harun DOKUZ", role: "B.K.Kpt", shift: 1, leaveQuota: 30 },
+      { id: "51788", sicil: "51788", name: "Cem ERİNÇİN", role: "B.K.Kpt", shift: 2, leaveQuota: 30 },
+      { id: "52350", sicil: "52350", name: "Adnan Kerem YALÇIN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "52179", sicil: "52179", name: "Ahmet UYGUN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "50976", sicil: "50976", name: "Ali GÜL", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "23078", sicil: "23078", name: "Ali Rıza URAZ", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "53209", sicil: "53209", name: "Berat Erkan ALSANCAK", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "51811", sicil: "51811", name: "Burak Reis YAVUZ", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "51042", sicil: "51042", name: "Bülent MEMİŞ", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "53889", sicil: "53889", name: "Çağlar ALBAYRAK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "52705", sicil: "52705", name: "Engin POLAT", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52742", sicil: "52742", name: "Engin ŞİMŞEK", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "53888", sicil: "53888", name: "Erçin GÖNÜLCAN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "52946", sicil: "52946", name: "Ergün ÖZGÜN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "52952", sicil: "52952", name: "Fatih IŞIK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "53758", sicil: "53758", name: "Gökhan KARSLI", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "52744", sicil: "52744", name: "Kerem GÜL", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52940", sicil: "52940", name: "Mehmet Özgün ÜNLÜ", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52960", sicil: "52960", name: "Mert ATAYILMAZ", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "52570", sicil: "52570", name: "Mertol AKOĞLAN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "51794", sicil: "51794", name: "Murat TURAN", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "51805", sicil: "51805", name: "Sunay IRMAK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "52181", sicil: "52181", name: "Şuayip GÜLER", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52219", sicil: "52219", name: "Şükrü KURUN", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 },
+      { id: "52480", sicil: "52480", name: "Tayfun GÜR", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "52223", sicil: "52223", name: "Toygar SEZGİN", role: "Kılvz.Kpt.", shift: 3, leaveQuota: 30 },
+      { id: "52935", sicil: "52935", name: "Umut ÇELİK", role: "Kılvz.Kpt.", shift: 1, leaveQuota: 30 },
+      { id: "52938", sicil: "52938", name: "Vehbi DEMİR", role: "Kılvz.Kpt.", shift: 2, leaveQuota: 30 }
     ];
 
-    const STATUS_CYCLE = ["Ç", "İ", "R", "V", "K", ""];
+    // Sadeleştirilmiş Durum Döngüsü: Ç (Çalışıyor) -> G (Görevli) -> İ (İzinde) -> R (Rotasyon) -> Boş
+    const STATUS_CYCLE = ["Ç", "G", "İ", "R", ""];
 
-    // Uygulama Durumu
     let state = {
-      postaTitle: "Mehmetçik 2. Posta",
+      postaTitle: localStorage.getItem("kegm_posta") || "Mehmetçik 2. Posta",
       pilots: JSON.parse(localStorage.getItem("kegm_pilots")) || structuredClone(DEFAULT_PILOTS),
-      // records["2026-11"]["52181"][19] = "Ç"
       records: JSON.parse(localStorage.getItem("kegm_records")) || {},
-      notes: JSON.parse(localStorage.getItem("kegm_notes")) || {},
       myPilotId: localStorage.getItem("kegm_my_pilot") || "",
       firebaseUrl: localStorage.getItem("kegm_firebase_url") || "",
       kegmTrafikUrl: localStorage.getItem("kegm_trafik_url") || "https://suayipguler-ship-it.github.io/Kegm-trafik/"
     };
 
+    // Eski kayıtlarda leaveQuota yoksa 30 olarak tamamla
+    state.pilots.forEach(p => {
+      if (typeof p.leaveQuota !== "number") p.leaveQuota = 30;
+    });
+
     let syncTimer = null;
 
     // =========================================================================
-    // 2. 4 GÜN ÇALIŞMA / 8 GÜN İZİN DÖNGÜ MOTORU (REFERANS: 19 KASIM 2026)
+    // 2. İZİN HAKKI VE KALAN İZİN HESAPLAMA MOTORU (TÜM KAYITLI AYLAR)
     // =========================================================================
-    // 1. Vardiya: 19 Kasım 2026 başlıyor (19, 20, 21, 22 çalışır; 23 Kasım'da nöbeti 2. Vardiyaya devreder)
-    // 12 günlük tam döngü: Gün 0..3 -> V1 Görevde | Gün 4..7 -> V2 Görevde | Gün 8..11 -> V3 Görevde
+    function getTotalUsedLeaveAcrossAllMonths(pilotId) {
+      let totalUsed = 0;
+      Object.values(state.records).forEach(monthObj => {
+        const pilotDays = monthObj[pilotId];
+        if (pilotDays) {
+          Object.values(pilotDays).forEach(val => {
+            if (val === "İ") totalUsed++;
+          });
+        }
+      });
+      return totalUsed;
+    }
+
+    function getRemainingLeave(pilot) {
+      const quota = Number(pilot.leaveQuota ?? 30);
+      const used = getTotalUsedLeaveAcrossAllMonths(pilot.id);
+      return quota - used;
+    }
+
+    // =========================================================================
+    // 3. 4 GÜN ÇALIŞMA / 8 GÜN İZİN DÖNGÜ MOTORU (REFERANS: 19 KASIM 2026)
+    // =========================================================================
     function getCycleStatusForDate(shiftNumber, year, monthIndex, day) {
-      const refUTC = Date.UTC(2026, 10, 19); // 19 Kasım 2026 (Ay 0-indeksli: 10 = Kasım)
+      const refUTC = Date.UTC(2026, 10, 19); // 19 Kasım 2026
       const targetUTC = Date.UTC(year, monthIndex, day);
       const diffDays = Math.floor((targetUTC - refUTC) / 86400000);
-      const mod12 = ((diffDays % 12) + 12) % 12; // 0..11 arası pozitif mod
-
-      const activeShift = Math.floor(mod12 / 4) + 1; // 1, 2 veya 3
+      const mod12 = ((diffDays % 12) + 12) % 12;
+      const activeShift = Math.floor(mod12 / 4) + 1;
       return Number(shiftNumber) === activeShift ? "Ç" : "İ";
     }
 
@@ -512,7 +563,6 @@
       state.pilots.forEach(p => {
         if (!state.records[monthKey][p.id]) {
           state.records[monthKey][p.id] = {};
-          // Varsayılan resmi iaşe çizelgesi başlangıcı: tüm günler "Ç"
           for (let d = 1; d <= totalDays; d++) {
             state.records[monthKey][p.id][d] = "Ç";
           }
@@ -520,14 +570,13 @@
       });
     }
 
-    // 4/8 Döngüsünü seçili aya uygula
     function applyCycleToMonth() {
       const year = Number(document.getElementById("yearSelect").value);
       const monthIndex = Number(document.getElementById("monthSelect").value);
       const monthKey = getMonthKey();
       const totalDays = getDaysInMonth(year, monthIndex);
 
-      if (!confirm(`${year} yılı seçili ayı için tüm kaptanlara 19 Kasım referanslı (4 gün görev / 8 gün izin) vardiya döngüsü uygulansın mı?`)) return;
+      if (!confirm(`${year} yılı seçili ayı için tüm kaptanlara 19 Kasım referanslı (4 gün görev / 8 gün izin) döngüsü uygulansın mı?`)) return;
 
       state.records[monthKey] = {};
       state.pilots.forEach(p => {
@@ -540,14 +589,13 @@
       renderAll();
     }
 
-    // Tümünü resmi iaşe varsayılanı "Ç" yap
     function fillAllStandard() {
       const year = Number(document.getElementById("yearSelect").value);
       const monthIndex = Number(document.getElementById("monthSelect").value);
       const monthKey = getMonthKey();
       const totalDays = getDaysInMonth(year, monthIndex);
 
-      if (!confirm("Bu aydaki tüm kayıtlar sıfırlanıp tamamı 'Ç' (Çalışır) olarak işaretlensin mi?")) return;
+      if (!confirm("Bu aydaki tüm günler 'Ç' (Çalışıyor) olarak işaretlensin mi?")) return;
 
       state.records[monthKey] = {};
       state.pilots.forEach(p => {
@@ -561,7 +609,7 @@
     }
 
     // =========================================================================
-    // 3. TABLO & MOBİL EDİTÖR RENDER İŞLEMLERİ
+    // 4. TABLO & RENKLİ MOBİL EDİTÖR RENDER İŞLEMLERİ
     // =========================================================================
     function renderAll() {
       const year = Number(document.getElementById("yearSelect").value);
@@ -571,17 +619,15 @@
 
       ensureMonthData(monthKey, year, monthIndex);
 
-      // Üst tarih aralığı metni (01.11.2026 - 30.11.2026)
       const mm = String(monthIndex + 1).padStart(2, "0");
       const ddEnd = String(totalDays).padStart(2, "0");
       document.getElementById("reportDateRange").textContent = `01.${mm}.${year} - ${ddEnd}.${mm}.${year}`;
       document.getElementById("reportPostaLabel").textContent = state.postaTitle;
       document.getElementById("postaTitleInput").value = state.postaTitle;
 
-      // Kaptan Seçim Listelerini Doldur
       populateSelects();
 
-      // Tablo Başlığı (Resmi İaşe Formatı)
+      // Tablo Başlığı
       const thead = document.getElementById("iaseThead");
       let dayHeaders = "";
       for (let d = 1; d <= totalDays; d++) {
@@ -597,6 +643,7 @@
           <th colspan="${totalDays}">TİH</th>
           <th rowspan="2" class="col-stat">Çalışma</th>
           <th rowspan="2" class="col-stat">İzin</th>
+          <th rowspan="2" class="col-kalan">Kalan<br>İzin</th>
           <th rowspan="2" class="col-imza">İmza</th>
         </tr>
         <tr>
@@ -618,22 +665,24 @@
         let cellsHtml = "";
 
         for (let d = 1; d <= totalDays; d++) {
-          const val = pRec[d] !== undefined ? pRec[d] : "Ç";
+          let val = pRec[d] !== undefined ? pRec[d] : "Ç";
+          // Eski V veya K kaydı kalmışsa temizle
+          if (val === "V" || val === "K") val = "Ç";
+
           if (val === "İ") {
             leaveCount++;
-          } else if (val === "" || val === "K") {
+          } else if (val === "") {
             emptyCount++;
           } else {
-            // Ç, R, V aktif iaşe/görev günü sayılır
+            // Ç (Çalışıyor), G (Görevli), R (Rotasyon) aktif iaşe günü sayılır
             workCount++;
           }
 
           const cellClass =
             val === "Ç" ? "cell-C" :
+            val === "G" ? "cell-G" :
             val === "İ" ? "cell-I" :
-            val === "R" ? "cell-R" :
-            val === "V" ? "cell-V" :
-            val === "K" ? "cell-K" : "cell-empty";
+            val === "R" ? "cell-R" : "cell-empty";
 
           cellsHtml += `<td class="col-gun ${cellClass}" onclick="cycleCell('${pilot.id}', ${d})" title="${pilot.name} - ${d}.${mm}.${year}">${val || "-"}</td>`;
         }
@@ -641,8 +690,9 @@
         totalActiveAll += workCount;
         totalLeaveAll += leaveCount;
 
-        // Resmi belgedeki TAM mantığı: Ayın tüm günlerinde çalışmışsa (İzin=0 ve Boş=0) "TAM" yazar
         const calismaText = (leaveCount === 0 && emptyCount === 0 && workCount === totalDays) ? "TAM" : workCount;
+        const remainingLeave = getRemainingLeave(pilot);
+        const kalanRenk = remainingLeave < 0 ? "color:#dc2626;" : "";
         const isMe = state.myPilotId === pilot.id;
 
         rowsHtml += `
@@ -654,6 +704,7 @@
             ${cellsHtml}
             <td class="col-stat">${calismaText}</td>
             <td class="col-stat">${leaveCount}</td>
+            <td class="col-kalan" style="${kalanRenk}">${remainingLeave}</td>
             <td class="col-imza"></td>
           </tr>
         `;
@@ -661,7 +712,7 @@
 
       tbody.innerHTML = rowsHtml;
       document.getElementById("summaryFooter").textContent =
-        `Toplam Personel: ${state.pilots.length} | Toplam Görev/İaşe Günü: ${totalActiveAll} | Toplam İzin Günü: ${totalLeaveAll}`;
+        `Toplam Personel: ${state.pilots.length} | Aktif İaşe Günü: ${totalActiveAll} | Bu Ay Kullanılan İzin: ${totalLeaveAll}`;
 
       renderMyMobileEditor(monthKey, totalDays);
     }
@@ -681,47 +732,67 @@
       box.classList.remove("hidden");
 
       const pRec = state.records[monthKey][pilot.id] || {};
-      let work = 0, leave = 0;
+      let cCount = 0, gCount = 0, iCount = 0, rCount = 0;
       let gridHtml = "";
 
       for (let d = 1; d <= totalDays; d++) {
-        const val = pRec[d] !== undefined ? pRec[d] : "Ç";
-        if (val === "İ") leave++;
-        else if (val !== "" && val !== "K") work++;
+        let val = pRec[d] !== undefined ? pRec[d] : "Ç";
+        if (val === "V" || val === "K") val = "Ç";
+
+        if (val === "Ç") cCount++;
+        else if (val === "G") gCount++;
+        else if (val === "İ") iCount++;
+        else if (val === "R") rCount++;
 
         const badgeStyle =
-          val === "Ç" ? "bg-white border-slate-300 text-slate-900" :
-          val === "İ" ? "bg-slate-300 border-slate-400 text-slate-900" :
-          val === "R" ? "bg-yellow-200 border-yellow-400 text-yellow-900" :
-          val === "V" ? "bg-sky-200 border-sky-400 text-sky-900" :
-          val === "K" ? "bg-red-200 border-red-400 text-red-900" :
+          val === "Ç" ? "bg-emerald-100 border-emerald-400 text-emerald-950" :
+          val === "G" ? "bg-blue-100 border-blue-400 text-blue-950" :
+          val === "İ" ? "bg-orange-200 border-orange-400 text-orange-950" :
+          val === "R" ? "bg-purple-100 border-purple-400 text-purple-950" :
           "bg-slate-100 border-dashed border-slate-300 text-slate-400";
 
         gridHtml += `
           <button onclick="cycleCell('${pilot.id}', ${d})"
-            class="border rounded-md py-1 flex flex-col items-center justify-center active:scale-95 transition ${badgeStyle}">
-            <span class="text-[9px] opacity-70">${d}</span>
+            class="border-2 rounded-xl py-1.5 flex flex-col items-center justify-center active:scale-95 transition shadow-2xs ${badgeStyle}">
+            <span class="text-[10px] font-bold opacity-75">${d}</span>
             <span class="text-xs font-extrabold">${val || "-"}</span>
           </button>
         `;
       }
 
-      document.getElementById("myPilotInfoText").textContent =
-        `${pilot.name} (${pilot.sicil} • ${pilot.shift}. Vardiya) — Çalışma: ${work} gün | İzin: ${leave} gün`;
+      const remaining = getRemainingLeave(pilot);
+      const remBadge = document.getElementById("myRemainingLeaveBadge");
+      remBadge.textContent = `${remaining} gün`;
+      remBadge.className = remaining < 0
+        ? "text-base font-extrabold text-red-600"
+        : "text-base font-extrabold text-emerald-700";
+
+      document.getElementById("myLeaveQuotaInput").value = pilot.leaveQuota ?? 30;
+      document.getElementById("myPilotNameBadge").textContent = `${pilot.name} (${pilot.sicil} • ${pilot.shift}. Vardiya)`;
+      document.getElementById("myPilotMonthStats").textContent =
+        `Bu Ay: ${cCount} Çalışıyor • ${gCount} Görevli • ${iCount} İzinde • ${rCount} Rotasyon`;
       document.getElementById("mobileDaysGrid").innerHTML = gridHtml;
     }
 
-    // Hücreye tıklayınca durum değiştirme (Ç -> İ -> R -> V -> K -> Boş)
+    // Hücreye tıklayınca durum değiştirme (Ç -> G -> İ -> R -> Boş)
     function cycleCell(pilotId, day) {
       const monthKey = getMonthKey();
-      const current = state.records[monthKey][pilotId][day] ?? "Ç";
+      let current = state.records[monthKey][pilotId][day] ?? "Ç";
+      if (!STATUS_CYCLE.includes(current)) current = "Ç";
       const nextIdx = (STATUS_CYCLE.indexOf(current) + 1) % STATUS_CYCLE.length;
       state.records[monthKey][pilotId][day] = STATUS_CYCLE[nextIdx];
       persistAndSync();
       renderAll();
     }
 
-    // Toplu Tarih Aralığı Uygulama
+    function updateMyLeaveQuota(val) {
+      const pilot = state.pilots.find(p => p.id === state.myPilotId);
+      if (!pilot) return;
+      pilot.leaveQuota = Math.max(0, Number(val) || 0);
+      persistAndSync();
+      renderAll();
+    }
+
     function applyBulkRange() {
       const pilotId = document.getElementById("bulkPilotSelect").value;
       const startDay = Number(document.getElementById("bulkStartDay").value);
@@ -740,12 +811,6 @@
       for (let d = startDay; d <= endDay; d++) {
         state.records[monthKey][pilotId][d] = status;
       }
-      // İlişiği kesildiyse ay sonuna kadar boş bırak
-      if (status === "K") {
-        for (let d = endDay + 1; d <= maxDay; d++) {
-          state.records[monthKey][pilotId][d] = "";
-        }
-      }
 
       persistAndSync();
       closeModal("bulkModal");
@@ -753,7 +818,7 @@
     }
 
     // =========================================================================
-    // 4. EXCEL (.XLSX) ÇIKTISI (RESMİ İAŞE LİSTESİ FORMATINDA)
+    // 5. EXCEL (.XLSX) ÇIKTISI
     // =========================================================================
     function exportExcel() {
       const year = Number(document.getElementById("yearSelect").value);
@@ -763,36 +828,34 @@
       const mm = String(monthIndex + 1).padStart(2, "0");
 
       const aoa = [];
-      // Üst Kurum Başlıkları
-      aoa.push(["KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ", "", "", "", `İAŞE LİSTESİ (01.${mm}.${year} - ${totalDays}.${mm}.${year})`, ...Array(totalDays - 1).fill(""), state.postaTitle, "", ""]);
+      aoa.push(["KIYI EMNİYETİ GENEL MÜDÜRLÜĞÜ", "", "", "", `İAŞE VE İZİN LİSTESİ (01.${mm}.${year} - ${totalDays}.${mm}.${year})`, ...Array(totalDays - 1).fill(""), state.postaTitle, "", "", ""]);
       aoa.push(["Gemi Trafik ve Kılavuzluk Dairesi Başkanlığı"]);
 
-      // Tablo Üst Başlık Satırı 1
-      const header1 = ["S. No", "Sicil", "Adı Soyadı", "Görevi", "TİH", ...Array(totalDays - 1).fill(""), "Çalışma", "İzin", "İmza"];
-      const header2 = ["", "", "", "", ...Array.from({ length: totalDays }, (_, i) => i + 1), "", "", ""];
+      const header1 = ["S. No", "Sicil", "Adı Soyadı", "Görevi", "TİH", ...Array(totalDays - 1).fill(""), "Çalışma", "İzin", "Kalan İzin", "İmza"];
+      const header2 = ["", "", "", "", ...Array.from({ length: totalDays }, (_, i) => i + 1), "", "", "", ""];
       aoa.push(header1);
       aoa.push(header2);
 
-      // Personel Satırları
       state.pilots.forEach((p, idx) => {
         const pRec = state.records[monthKey][p.id] || {};
         let work = 0, leave = 0, empty = 0;
         const dayVals = [];
 
         for (let d = 1; d <= totalDays; d++) {
-          const v = pRec[d] !== undefined ? pRec[d] : "Ç";
+          let v = pRec[d] !== undefined ? pRec[d] : "Ç";
+          if (v === "V" || v === "K") v = "Ç";
           dayVals.push(v);
           if (v === "İ") leave++;
-          else if (v === "" || v === "K") empty++;
+          else if (v === "") empty++;
           else work++;
         }
 
         const calismaStr = (leave === 0 && empty === 0 && work === totalDays) ? "TAM" : work;
-        aoa.push([idx + 1, p.sicil, p.name, p.role, ...dayVals, calismaStr, leave, ""]);
+        const remaining = getRemainingLeave(p);
+        aoa.push([idx + 1, p.sicil, p.name, p.role, ...dayVals, calismaStr, leave, remaining, ""]);
       });
 
       const ws = XLSX.utils.aoa_to_sheet(aoa);
-      // Hücre birleştirmeleri (TİH başlığı ve dikey başlıklar)
       ws["!merges"] = [
         { s: { r: 2, c: 0 }, e: { r: 3, c: 0 } },
         { s: { r: 2, c: 1 }, e: { r: 3, c: 1 } },
@@ -801,24 +864,26 @@
         { s: { r: 2, c: 4 }, e: { r: 2, c: 4 + totalDays - 1 } },
         { s: { r: 2, c: 4 + totalDays }, e: { r: 3, c: 4 + totalDays } },
         { s: { r: 2, c: 5 + totalDays }, e: { r: 3, c: 5 + totalDays } },
-        { s: { r: 2, c: 6 + totalDays }, e: { r: 3, c: 6 + totalDays } }
+        { s: { r: 2, c: 6 + totalDays }, e: { r: 3, c: 6 + totalDays } },
+        { s: { r: 2, c: 7 + totalDays }, e: { r: 3, c: 7 + totalDays } }
       ];
 
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Iase_Listesi");
-      XLSX.writeFile(wb, `KEGM_Iase_Listesi_${year}_${mm}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, ws, "Iase_ve_Izin_Listesi");
+      XLSX.writeFile(wb, `KEGM_Iase_Izin_Listesi_${year}_${mm}.xlsx`);
     }
 
     // =========================================================================
-    // 5. KAPTAN YÖNETİMİ & SEÇİM KUTULARI
+    // 6. KAPTAN YÖNETİMİ & İZİN BAKİYESİ TABLOSU
     // =========================================================================
     function populateSelects() {
       const mySel = document.getElementById("myPilotSelect");
       const bulkSel = document.getElementById("bulkPilotSelect");
 
-      const opts = state.pilots.map((p, i) =>
-        `<option value="${p.id}" ${p.id === state.myPilotId ? "selected" : ""}>${i + 1}. ${p.name} (${p.sicil} - V${p.shift})</option>`
-      ).join("");
+      const opts = state.pilots.map((p, i) => {
+        const rem = getRemainingLeave(p);
+        return `<option value="${p.id}" ${p.id === state.myPilotId ? "selected" : ""}>${i + 1}. ${p.name} (V${p.shift} • Kalan İzin: ${rem}g)</option>`;
+      }).join("");
 
       mySel.innerHTML = `<option value="">-- Kılavuz Kaptan Seçiniz --</option>` + opts;
       bulkSel.innerHTML = opts;
@@ -838,24 +903,34 @@
 
     function renderPilotManageTable() {
       const tbody = document.getElementById("pilotManageTbody");
-      tbody.innerHTML = state.pilots.map((p, i) => `
-        <tr>
-          <td class="p-2 font-bold">${i + 1}</td>
-          <td class="p-2 font-mono">${p.sicil}</td>
-          <td class="p-2 font-semibold">${p.name}</td>
-          <td class="p-2">${p.role}</td>
-          <td class="p-2">
-            <select onchange="updatePilotShift('${p.id}', this.value)" class="border rounded px-1.5 py-0.5 font-bold">
-              <option value="1" ${p.shift == 1 ? "selected" : ""}>1. Vardiya</option>
-              <option value="2" ${p.shift == 2 ? "selected" : ""}>2. Vardiya</option>
-              <option value="3" ${p.shift == 3 ? "selected" : ""}>3. Vardiya</option>
-            </select>
-          </td>
-          <td class="p-2 text-right">
-            <button onclick="removePilot('${p.id}')" class="text-red-600 hover:underline font-semibold">Sil</button>
-          </td>
-        </tr>
-      `).join("");
+      tbody.innerHTML = state.pilots.map((p, i) => {
+        const used = getTotalUsedLeaveAcrossAllMonths(p.id);
+        const quota = Number(p.leaveQuota ?? 30);
+        const rem = quota - used;
+        return `
+          <tr>
+            <td class="p-2 font-bold">${i + 1}</td>
+            <td class="p-2 font-mono">${p.sicil}</td>
+            <td class="p-2 font-bold">${p.name}</td>
+            <td class="p-2">
+              <select onchange="updatePilotShift('${p.id}', this.value)" class="border rounded-lg px-1.5 py-1 font-bold">
+                <option value="1" ${p.shift == 1 ? "selected" : ""}>1. Vardiya</option>
+                <option value="2" ${p.shift == 2 ? "selected" : ""}>2. Vardiya</option>
+                <option value="3" ${p.shift == 3 ? "selected" : ""}>3. Vardiya</option>
+              </select>
+            </td>
+            <td class="p-2 text-center">
+              <input type="number" min="0" max="365" value="${quota}" onchange="updatePilotLeaveQuota('${p.id}', this.value)"
+                class="w-16 border border-amber-400 bg-amber-50 rounded-lg px-1.5 py-1 text-center font-extrabold" />
+            </td>
+            <td class="p-2 text-center font-bold text-orange-700">${used} gün</td>
+            <td class="p-2 text-center font-extrabold ${rem < 0 ? 'text-red-600' : 'text-emerald-700'}">${rem} gün</td>
+            <td class="p-2 text-right">
+              <button onclick="removePilot('${p.id}')" class="text-red-600 hover:underline font-bold">Sil</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
     }
 
     function updatePilotShift(id, shift) {
@@ -867,14 +942,25 @@
       }
     }
 
+    function updatePilotLeaveQuota(id, val) {
+      const p = state.pilots.find(x => x.id === id);
+      if (p) {
+        p.leaveQuota = Math.max(0, Number(val) || 0);
+        persistAndSync();
+        renderPilotManageTable();
+        renderAll();
+      }
+    }
+
     function addPilot() {
       const sicil = document.getElementById("newSicil").value.trim();
       const name = document.getElementById("newName").value.trim();
       const role = document.getElementById("newRole").value;
       const shift = Number(document.getElementById("newShift").value);
+      const leaveQuota = Math.max(0, Number(document.getElementById("newLeaveQuota").value) || 30);
 
       if (!sicil || !name) return alert("Sicil ve Adı Soyadı zorunludur.");
-      state.pilots.push({ id: sicil, sicil, name, role, shift });
+      state.pilots.push({ id: sicil, sicil, name, role, shift, leaveQuota });
       document.getElementById("newSicil").value = "";
       document.getElementById("newName").value = "";
       persistAndSync();
@@ -899,7 +985,7 @@
     }
 
     // =========================================================================
-    // 6. FIREBASE BULUT SENKRONİZASYONU (REST API - EK KÜTÜPHANESİZ)
+    // 7. FIREBASE BULUT SENKRONİZASYONU
     // =========================================================================
     function getCleanFirebaseBase() {
       return state.firebaseUrl.trim().replace(/\/+$/, "");
@@ -927,10 +1013,10 @@
           })
         });
         badge.textContent = "● Bulut Senkron";
-        badge.className = "text-[11px] px-2 py-1 rounded-md bg-emerald-950 border border-emerald-600 text-emerald-300 font-medium";
+        badge.className = "text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400 text-emerald-200 font-semibold";
       } catch (e) {
         badge.textContent = "⚠ Bağlantı Hatası";
-        badge.className = "text-[11px] px-2 py-1 rounded-md bg-red-950 border border-red-600 text-red-300 font-medium";
+        badge.className = "text-[11px] px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400 text-red-200 font-semibold";
       }
     }
 
@@ -950,7 +1036,7 @@
         }
         const badge = document.getElementById("syncBadge");
         badge.textContent = "● Bulut Senkron";
-        badge.className = "text-[11px] px-2 py-1 rounded-md bg-emerald-950 border border-emerald-600 text-emerald-300 font-medium";
+        badge.className = "text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400 text-emerald-200 font-semibold";
       } catch (_) {}
     }
 
@@ -978,17 +1064,16 @@
       const box = document.getElementById("shareLinkBox");
       box.select();
       navigator.clipboard?.writeText(box.value);
-      alert("Paylaşım linki panoya kopyalandı! Kaptanlara WhatsApp'tan gönderebilirsiniz.");
+      alert("Paylaşım linki kopyalandı! Kaptanlara WhatsApp'tan gönderebilirsiniz.");
     }
 
     function startPolling() {
       if (syncTimer) clearInterval(syncTimer);
       if (getCleanFirebaseBase()) {
-        syncTimer = setInterval(pullFromCloud, 8000); // 8 saniyede bir canlı güncelleme
+        syncTimer = setInterval(pullFromCloud, 8000);
       }
     }
 
-    // Yardımcılar
     function changeMonth(delta) {
       const mSel = document.getElementById("monthSelect");
       const ySel = document.getElementById("yearSelect");
@@ -1029,16 +1114,12 @@
       el.classList.remove("flex");
     }
 
-    // URL parametresinden (?db=...) otomatik Firebase bağlantısı al
     (function init() {
       const params = new URLSearchParams(window.location.search);
       const dbParam = params.get("db");
       if (dbParam) {
         state.firebaseUrl = dbParam;
         localStorage.setItem("kegm_firebase_url", dbParam);
-      }
-      if (localStorage.getItem("kegm_posta")) {
-        state.postaTitle = localStorage.getItem("kegm_posta");
       }
       renderAll();
       if (getCleanFirebaseBase()) {
@@ -1049,4 +1130,3 @@
   </script>
 </body>
 </html>
-
